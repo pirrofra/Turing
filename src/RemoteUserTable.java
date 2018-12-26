@@ -1,6 +1,13 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+/**
+ * This interface defines method that can be called using RMI
+ * This interface is implemented by UserTable class
+ *
+ * @author Francesco Pirrò - Matr. 544539
+ */
 public interface RemoteUserTable extends Remote {
-    int registerUser(String username,String password) throws RemoteException,IllegalArgumentException;
+
+    public Operation registerUser(String username,String password) throws RemoteException,IllegalArgumentException;
 }
