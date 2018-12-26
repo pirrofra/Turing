@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Vector;
 
@@ -15,7 +16,7 @@ public class MessageBuffer {
             body=null;
         }
         else{
-            dimension=body.limit();
+            dimension=buff.limit();
             body=buff;
         }
     }
@@ -35,6 +36,11 @@ public class MessageBuffer {
             body.flip();
         }
         return new MessageBuffer(operation,body);
+    }
+
+    public static MessageBuffer createMessageBuffer(Operation operation, ByteBuffer file){
+        if(operation!=Operation.OK && operation!=Operation.END_EDIT) return null;
+        else return new MessageBuffer(operation,file);
     }
 
     public static MessageBuffer readMessage(SocketChannel socket) throws IOException{

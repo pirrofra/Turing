@@ -1,5 +1,4 @@
 import java.util.HashMap;
-import java.util.TreeMap;
 
 /**
  * This enum defines types of request/response between client and server
@@ -25,7 +24,8 @@ public enum Operation {
     EDITING_NOT_REQUESTED(-7),
     USER_NOT_FOUND(-8),
     USER_ALREADY_INVITED(-9),
-    PERMISSION_DENIED(-10);
+    PERMISSION_DENIED(-10),
+    FILE_TOO_BIG(-11);
     //--- RESPONSE ---
 
     int value;

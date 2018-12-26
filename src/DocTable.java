@@ -36,22 +36,22 @@ public class DocTable implements Serializable {
         else return doc.invite(inviter,invited);
     }
 
-    public Operation edit(String document,String user,int section) throws IllegalArgumentException{
+    public MessageBuffer Edit(String document,String user,int section) throws IllegalArgumentException,IOException{
         if(document==null) throw new IllegalArgumentException();
         Document doc=docMap.get(document);
-        if(doc==null) return Operation.DOCUMENT_NOT_FOUND;
+        if(doc==null) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
         else return doc.edit(section,user);
     }
 
-    public Operation endEdit(String document,String user,int section) throws IllegalArgumentException{
+    public Operation endEdit(String document,String user,int section, byte[] file) throws IllegalArgumentException,IOException{
         if(document==null) throw new IllegalArgumentException();
         Document doc=docMap.get(document);
         if(doc==null) return Operation.DOCUMENT_NOT_FOUND;
-        else return doc.endEdit(section,user);
+        else return doc.endEdit(section,user,file);
     }
 
+
     /* TODO: Edit che restituisce il contenuto del file in un MappedByteBuffer
-    *  TODO: endEdit che prende un buffer e salva il contenuto
     *  TODO: Show che restituisce la concatenazione di tutti i file in un buffer
     * */
 

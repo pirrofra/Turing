@@ -1,8 +1,11 @@
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Vector;
 
 /**
@@ -103,34 +106,62 @@ public class Document implements Serializable {
      * @param section section wanted to be edited
      * @param username user who requested the edit
      * @throws IllegalArgumentException if section is 0 or more than numSection and/or if username is null
-     * @return Operation.Document_Not_Found if the user has not been invited,
-     *         Operation.Section_Busy if someone else is already editing this section,
-     *         Operation.OK if is successful
+     * @throws IOException if an error occurs during I/O operations
+     * @return MessageBuffer containing result and filebuffer
      */
-    public synchronized Operation edit(int section,String username) throws IllegalArgumentException{
+    public synchronized MessageBuffer edit(int section,String username) throws IllegalArgumentException,IOException{
         if(section>numSection||section<1||username==null) throw new IllegalArgumentException();
-        else if(!userInvited.contains(username)) return Operation.DOCUMENT_NOT_FOUND;
+        else if(!userInvited.contains(username)) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
         else if(currentEdited[section-1]==null){
             currentEdited[section-1]=username;
-            return Operation.OK;
+            ByteBuffer file=openFile(sectionPath[section-1]);
+            return MessageBuffer.createMessageBuffer(Operation.OK,file);
         }
-        else return Operation.SECTION_BUSY;
+        else return MessageBuffer.createMessageBuffer(Operation.SECTION_BUSY);
+    }
+
+    /**
+     * Method to receive in a messageBuffer the entire document
+     * @param username user who sended the request
+     * @return messageBuffer containing the entire document
+     * @throws IllegalArgumentException if username is null
+     * @throws IOException if an error occurs during I/O operations
+     */
+    public synchronized MessageBuffer show(String username) throws IllegalArgumentException,IOException{
+        if(username==null) throw new IllegalArgumentException();
+        else if(!userInvited.contains(username)) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
+        int dimension=0;
+        for(Path path:sectionPath){
+            dimension+=Files.size(path);
+        }
+        ByteBuffer completeDocument=ByteBuffer.allocate(dimension);
+        for(Path path:sectionPath){
+            ByteBuffer section=openFile(path);
+            completeDocument.put(section);
+        }
+        completeDocument.flip();
+        return MessageBuffer.createMessageBuffer(Operation.OK,completeDocument);
+
     }
 
     /**
      * Method to approve and end edit request by a user
+     * the section is updated with new file
      * @param section section wanted to be edited
      * @param username user who requested the end edit
      * @return Operation.Document_Not_Found if the user has not been invited
      *         Operation.Editing_Not_Requested if the user has not requested an editing of this section
      *         Operation.OK if successful
      * @throws IllegalArgumentException if section is 0 or more than numSection and/or if username is null
+     * @throws IOException if an error occurs during I/O operations
      */
-    public synchronized Operation endEdit(int section,String username) throws IllegalArgumentException{
+    public synchronized Operation endEdit(int section,String username,byte[] file) throws IllegalArgumentException,IOException{
         if(section>numSection||section<1) throw new IllegalArgumentException();
         else if(!userInvited.contains(username)) return Operation.DOCUMENT_NOT_FOUND;
         else if(currentEdited[section-1]==null||currentEdited[section-1].compareTo(username)!=0) return Operation.EDITING_NOT_REQUESTED;
+        else if(file.length>Integer.MAX_VALUE/numSection) return Operation.FILE_TOO_BIG;
         else{
+            saveFile(sectionPath[section-1],file);
             currentEdited[section-1]=null;
             return Operation.OK;
         }
@@ -160,6 +191,32 @@ public class Document implements Serializable {
     public synchronized boolean isInvited(String user)throws IllegalArgumentException{
         if(user==null) throw new IllegalArgumentException();
         return userInvited.contains(user);
+    }
+
+    /**
+     * Static method to save an array byte in a file
+     * @param path path of the file where to save
+     * @param file content to save
+     * @throws IOException if an error occurs during I/O operation on the file
+     */
+    private static void saveFile(Path path,byte[] file) throws IOException{
+        FileChannel channel=FileChannel.open(path, StandardOpenOption.TRUNCATE_EXISTING);
+        ByteBuffer FileBuffer=ByteBuffer.wrap(file);
+        while(FileBuffer.hasRemaining()){
+            channel.write(FileBuffer);
+        }
+        channel.close();
+    }
+
+    /**
+     * Static method to open a file and copy its content in a buffer
+     * @param path file to open
+     * @return buffer containing the file
+     * @throws IOException if an error occurs during I/O operation on the file
+     */
+    private static ByteBuffer openFile(Path path) throws IOException{
+        FileChannel file=FileChannel.open(path,StandardOpenOption.READ);
+        return file.map(FileChannel.MapMode.READ_ONLY,0,file.size());
     }
 
 }
