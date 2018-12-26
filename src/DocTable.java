@@ -52,7 +52,7 @@ public class DocTable implements Serializable {
     }
 
     /* TODO:
-    *   1)Edit che restituisce il contenuto del file in un buffer
+    *   1)Edit che restituisce il contenuto del file in un MappedByteBuffer
     *   2)endEdit che prende un buffer e salva il contenuto
     *   3)Show che restituisce la concatenazione di tutti i file in un buffer
     * */
