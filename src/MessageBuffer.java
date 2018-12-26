@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Vector;
 
 public class MessageBuffer {
     private Operation OP;
@@ -57,6 +58,7 @@ public class MessageBuffer {
         header.flip();
         write(socket,header,8);
         write(socket,body,dimension);
+        body.flip();
     }
 
     private static void read(SocketChannel socket, ByteBuffer buff,int size) throws IOException {
@@ -75,8 +77,19 @@ public class MessageBuffer {
         }
     }
 
-    //TODO:Accesso agli argomenti del messaggio (probabilmente come array di Stringhe)
-    //TODO:Gli interi saranno parsati a convenienza
+    public Vector<byte[]> getArgs(){
+        if(body==null) return null;
+        Vector<byte[]> argsVector=new Vector<>();
+        while(body.hasRemaining()){
+            int dimension=body.getInt();
+            byte[] arg=new byte[dimension];
+            body.get(arg);
+            argsVector.add(arg);
+        }
+        body.flip();
+        return argsVector;
+    }
+
 
 }
 
