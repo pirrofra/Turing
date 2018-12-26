@@ -20,7 +20,7 @@ public class MessageBuffer {
         }
     }
 
-    public static MessageBuffer createMessage(Operation operation, byte[]... Args){
+    public static MessageBuffer createMessageBuffer(Operation operation, byte[]... Args){
         int dim=0;
         ByteBuffer body=null;
         for(byte[] array:Args){
@@ -75,6 +75,10 @@ public class MessageBuffer {
             if(byte_wrote<0) throw new IOException();
             size -=byte_wrote;
         }
+    }
+
+    public Operation getOP(){
+        return OP;
     }
 
     public Vector<byte[]> getArgs(){
