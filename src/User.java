@@ -73,6 +73,19 @@ public class User implements Serializable {
     }
 
     /**
+     * Method to get the list of this user's document
+     * @return a string containing all user's document
+     */
+    public synchronized String documentList(){
+        StringBuilder list=new StringBuilder();
+            for(String doc: documentList){
+                list.append(doc);
+                list.append("\n");
+            }
+        return list.toString();
+    }
+
+    /**
      * Method to notify user has logged off
      */
     public synchronized void logoff(){

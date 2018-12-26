@@ -80,4 +80,11 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
         if(user==null) return Operation.USER_NOT_FOUND;
         else return user.addDocument(document);
     }
+
+    public String getList(String username) throws IllegalArgumentException{
+        if(username==null) throw new IllegalArgumentException();
+        User user=userMap.get(username);
+        if(user==null) return null;
+        else return user.documentList();
+    }
 }
