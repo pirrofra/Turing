@@ -46,7 +46,7 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
     public Operation registerUser(String username, String password) throws RemoteException, IllegalArgumentException {
         User newUser=new User(username,password);
         if(userMap.putIfAbsent(username,newUser)==null) return Operation.OK;
-        else return Operation.USERNAME_NOT_AVAILABLE;
+        else return Operation.NAME_NOT_AVAILABLE;
     }
 
     /**
