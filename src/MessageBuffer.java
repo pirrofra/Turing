@@ -74,6 +74,9 @@ public class MessageBuffer {
             size -=byte_wrote;
         }
     }
-//TODO:Accesso agli argomenti del messaggio (probabilmente come array di Byte)
+
+    //TODO:Accesso agli argomenti del messaggio (probabilmente come array di Stringhe)
+    //TODO:Gli interi saranno parsati a convenienza
+
 }
 
