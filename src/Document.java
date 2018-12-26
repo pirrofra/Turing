@@ -17,6 +17,8 @@ import java.util.Vector;
  * Constructor is private, to create an instance of Document is used the static method createDocument
  * private method initialize create one empty file for each section and it makes sure the path is complete
  *
+ * This class uses NIO to manages files.
+ *
  * This Class is Thread-Safe
  *
  * @author Francesco Pirrò - Matr. 544539

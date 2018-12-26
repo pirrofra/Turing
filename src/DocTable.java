@@ -2,6 +2,17 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This class is used to store all documents' data
+ * single Document's data are stored in instances of Document class
+ *
+ * Method for creating document, showing document, inviting new user and requesting an edit/end_edit are implemented
+ *
+ * Method show and edit returns a MessageBuffer, ready to be sent using a SocketChannel
+ * All others method simply return a Operation type which describes the result of the request.
+ *
+ * @author Francesco Pirrò - Matr. 544539
+ */
 public class DocTable implements Serializable {
 
     private ConcurrentHashMap<String,Document> docMap;

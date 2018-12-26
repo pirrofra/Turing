@@ -6,6 +6,9 @@ import java.util.HashMap;
  * @author Francesco Pirrò - Matr. 544539
  */
 public enum Operation {
+
+    //TODO: Commenti a Operation
+
     LOGIN(1),
     CREATE(2),
     SHOW(3),

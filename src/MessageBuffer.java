@@ -5,6 +5,9 @@ import java.nio.channels.SocketChannel;
 import java.util.Vector;
 
 public class MessageBuffer {
+
+    //TODO: COMMENTI A MESSAGEBUFFER
+
     private Operation OP;
     private int dimension;
     private ByteBuffer body;
@@ -99,7 +102,6 @@ public class MessageBuffer {
         body.flip();
         return argsVector;
     }
-
 
 }
 
