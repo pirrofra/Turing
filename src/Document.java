@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,7 +18,7 @@ import java.util.Vector;
  *
  * @author Francesco Pirrò - Matr. 544539
  */
-public class Document {
+public class Document implements Serializable {
     private String documentName;
     private String creator;
     private int numSection;
