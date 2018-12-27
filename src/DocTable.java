@@ -19,9 +19,8 @@ public class DocTable implements Serializable {
     private String docPath;
 
     //TODO:Show deve anche indicare chi sta editando le sezioni
-    //TODO:Lista e Show devono dire il numero di sezioni in cui il file è diviso
+    //TODO:Lista deve indicare il numero di sezioni e i possibili editor
     //TODO:Serializzazione
-    //TODO:Al logout chiudi l'edit se è aperto
     /**
      * Class Constructor with no parameter for ConcurrentHashMap
      * @param path path where to store all documents' sections
@@ -189,7 +188,5 @@ public class DocTable implements Serializable {
             }
         }
     }
-
-
 
 }
