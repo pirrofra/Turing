@@ -1,4 +1,4 @@
-package Server;
+package ServerData;
 
 import Message.MessageBuffer;
 import Message.Operation;
@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class is used to store all documents' data
- * single Server.Document's data are stored in instances of Server.Document class
+ * single ServerData.Document's data are stored in instances of ServerData.Document class
  *
  * Method for creating document, showing document, inviting new user and requesting an edit/end_edit are implemented
  *
@@ -57,7 +57,7 @@ public class DocTable implements Serializable {
      *         Message.Operation.OK if successful
      * @throws IllegalArgumentException if name and/or creator are null or numsections is zero or less
      */
-    public Operation createDocument(String name, String creator, int numSections) throws IllegalArgumentException{
+    /*package*/ Operation createDocument(String name, String creator, int numSections) throws IllegalArgumentException{
         Document newDoc;
         try{
             newDoc=Document.createDocument(name,creator,numSections,docPath);
@@ -79,7 +79,7 @@ public class DocTable implements Serializable {
      *         Message.Operation.Ok if successful
      * @throws IllegalArgumentException if document, inviter and/or invited are null
      */
-    public Operation invite(String document, String inviter,String invited) throws IllegalArgumentException{
+    /*package*/ Operation invite(String document, String inviter,String invited) throws IllegalArgumentException{
         if(document==null) throw new IllegalArgumentException();
         Document doc=docMap.get(document);
         if(doc==null) return Operation.DOCUMENT_NOT_FOUND;
@@ -95,7 +95,7 @@ public class DocTable implements Serializable {
      *         a generic fail error is sent if an i/o error occurs
      * @throws IllegalArgumentException if document or user are null or section is not an existing section number
      */
-    public MessageBuffer edit(String document,String user,int section) throws IllegalArgumentException{
+    /*package*/ MessageBuffer edit(String document,String user,int section) throws IllegalArgumentException{
         if(document==null) throw new IllegalArgumentException();
         Document doc=docMap.get(document);
         if(doc==null) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
@@ -121,7 +121,7 @@ public class DocTable implements Serializable {
      *         Message.Operation.OK if successful
      * @throws IllegalArgumentException if document or user are null, section is not an existing section number or file is null
      */
-    public Operation endEdit(String document,String user,int section, byte[] file) throws IllegalArgumentException{
+    /*package*/ Operation endEdit(String document,String user,int section, byte[] file) throws IllegalArgumentException{
         if(document==null||file==null) throw new IllegalArgumentException();
         Document doc=docMap.get(document);
         if(doc==null) return Operation.DOCUMENT_NOT_FOUND;
@@ -143,7 +143,7 @@ public class DocTable implements Serializable {
      *         a generic Fail error is sent if an I/0 error occurs
      * @throws IllegalArgumentException if document and/or user are null
      */
-    public MessageBuffer show(String document,String user) throws IllegalArgumentException{
+    /*package*/ MessageBuffer show(String document,String user) throws IllegalArgumentException{
         if(document==null) throw new IllegalArgumentException();
         Document doc=docMap.get(document);
         if(doc==null) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
@@ -166,7 +166,7 @@ public class DocTable implements Serializable {
      *         a generic Fail error is sent if an I/0 error occurs
      * @throws IllegalArgumentException if document and/or user are null and section is not a valid section number
      */
-    public MessageBuffer show(String document,String user,int section) throws IllegalArgumentException{
+    /*package*/ MessageBuffer show(String document,String user,int section) throws IllegalArgumentException{
         if(document==null) throw new IllegalArgumentException();
         Document doc=docMap.get(document);
         if(doc==null) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
@@ -185,7 +185,7 @@ public class DocTable implements Serializable {
      * @param document document stopped to be edited
      * @param username username who stopped editing
      */
-    public void abruptStop(String document,String username){
+    /*package*/ void abruptStop(String document,String username){
         if(document!=null){
             Document doc=docMap.get(document);
             if(doc!=null){

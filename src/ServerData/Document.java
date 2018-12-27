@@ -1,4 +1,4 @@
-package Server;
+package ServerData;
 
 import Message.MessageBuffer;
 import Message.Operation;
@@ -14,12 +14,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.Vector;
 
 /**
- * This class is used to store basics information about Turing's Server.Document
+ * This class is used to store basics information about Turing's ServerData.Document
  * such as the creator, user invited, number of sections, path locations of all sections and user currently editing
  *
  * currentEdited keeps track of free sections - if currentEdited[i] is null, the section i+1 is free to be edited
  * sectionPath is used to store the paths of the various section of the file
- * Constructor is private, to create an instance of Server.Document is used the static method createDocument
+ * Constructor is private, to create an instance of ServerData.Document is used the static method createDocument
  * private method initialize create one empty file for each section and it makes sure the path is complete
  *
  * This class uses NIO to manages files.
@@ -28,7 +28,7 @@ import java.util.Vector;
  *
  * @author Francesco Pirrò - Matr. 544539
  */
-public class Document implements Serializable {
+/*package*/ class Document implements Serializable {
 
     //TODO:implementare la gestione dell'Indirizzo per il MulticastSocket
     private static final int maxSize=Integer.MAX_VALUE; //TODO:capire valore adatto
@@ -71,16 +71,16 @@ public class Document implements Serializable {
     }
 
     /**
-     * Static Method used to generate new Server.Document
-     * @param docName Server.Document name
+     * Static Method used to generate new ServerData.Document
+     * @param docName ServerData.Document name
      * @param userCreator user who created the document
      * @param sections number of sections
      * @param Path directory where all documents are stored
-     * @return new Server.Document
+     * @return new ServerData.Document
      * @throws IllegalArgumentException if docName and/or userCreator are null and if sections in 0 or less
      * @throws IOException if an error occurs during newDoc.initialize
      */
-    public static Document createDocument(String docName,String userCreator,int sections, String Path) throws IllegalArgumentException,IOException{
+    /*package*/ static Document createDocument(String docName,String userCreator,int sections, String Path) throws IllegalArgumentException,IOException{
         Document newDoc=new Document(docName,userCreator,sections);
         newDoc.initialize(Path);
         newDoc.addUser(userCreator);
@@ -100,16 +100,6 @@ public class Document implements Serializable {
         }
     }
 
-    /**
-     * Getter for a section path
-     * @param section number of section needed
-     * @throws IllegalArgumentException if section is 0 or more than numSection
-     * @return Path of the section needed
-     */
-    public Path getPath(int section) throws IllegalArgumentException{
-        if(section<1||section>numSection) throw new IllegalArgumentException();
-        return sectionPath[section-1];
-    }
 
     /**
      * Method to approve an edit request by a user
@@ -119,7 +109,7 @@ public class Document implements Serializable {
      * @throws IOException if an error occurs during I/O operations
      * @return Message.MessageBuffer containing result and filebuffer
      */
-    public synchronized MessageBuffer edit(int section,String username) throws IllegalArgumentException,IOException{
+    /*package*/ synchronized MessageBuffer edit(int section,String username) throws IllegalArgumentException,IOException{
         if(section>numSection||section<1||username==null) throw new IllegalArgumentException();
         else if(!userInvited.contains(username)) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
         else if(currentEdited[section-1]==null){
@@ -137,7 +127,7 @@ public class Document implements Serializable {
      * @throws IllegalArgumentException if username is null
      * @throws IOException if an error occurs during I/O operations
      */
-    public synchronized MessageBuffer show(String username) throws IllegalArgumentException,IOException{
+    /*package*/ synchronized MessageBuffer show(String username) throws IllegalArgumentException,IOException{
         if(username==null) throw new IllegalArgumentException();
         else if(!userInvited.contains(username)) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
         int dimension=0;
@@ -160,7 +150,7 @@ public class Document implements Serializable {
      * @return messageBuffer containing the section if successful
      * @throws IllegalArgumentException if section is not a valid section number or username is null
      */
-    public synchronized MessageBuffer show(String username,int section) throws IllegalArgumentException,IOException{
+    /*package*/ synchronized MessageBuffer show(String username,int section) throws IllegalArgumentException,IOException{
         if(section>numSection||section<1||username==null) throw new IllegalArgumentException();
         else if(!userInvited.contains(username)) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
         ByteBuffer file=openFile(sectionPath[section-1]);
@@ -178,7 +168,7 @@ public class Document implements Serializable {
      * @throws IllegalArgumentException if section is 0 or more than numSection and/or if username is null
      * @throws IOException if an error occurs during I/O operations
      */
-    public synchronized Operation endEdit(int section,String username,byte[] file) throws IllegalArgumentException,IOException{
+    /*package*/ synchronized Operation endEdit(int section,String username,byte[] file) throws IllegalArgumentException,IOException{
         if(section>numSection||section<1) throw new IllegalArgumentException();
         else if(!userInvited.contains(username)) return Operation.DOCUMENT_NOT_FOUND;
         else if(currentEdited[section-1]==null||currentEdited[section-1].compareTo(username)!=0) return Operation.EDITING_NOT_REQUESTED;
@@ -199,28 +189,17 @@ public class Document implements Serializable {
      *         Message.Operation.OK if successful
      * @throws IllegalArgumentException if inviter and/or invited are null
      */
-    public synchronized Operation invite(String inviter,String invited) throws IllegalArgumentException{
+    /*package*/ synchronized Operation invite(String inviter,String invited) throws IllegalArgumentException{
         if(invited==null||inviter==null) throw new IllegalArgumentException();
         else if(inviter.compareTo(creator)!=0) return Operation.PERMISSION_DENIED;
         else return addUser(invited);
     }
 
     /**
-     * Method to see if an user has been invited to see/edit this file
-     * @param user user to check
-     * @return true if the user has been invited, false otherwise
-     * @throws IllegalArgumentException if user is null
-     */
-    public synchronized boolean isInvited(String user)throws IllegalArgumentException{
-        if(user==null) throw new IllegalArgumentException();
-        return userInvited.contains(user);
-    }
-
-    /**
      * Method to notify the user has stopped editing without saving any content
      * @param user user who stopped editing
      */
-    public synchronized void abruptStop(String user){
+    /*package*/ synchronized void abruptStop(String user){
         if(user!=null){
             for(int i=0;i<numSection;i++){
                 if(currentEdited[i]!=null && currentEdited[i].compareTo(user)==0) currentEdited[i]=null;

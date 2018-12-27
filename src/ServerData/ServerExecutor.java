@@ -1,4 +1,4 @@
-package Server;
+package ServerData;
 
 import Message.MessageBuffer;
 import Message.Operation;

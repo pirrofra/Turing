@@ -1,6 +1,7 @@
-package Server;
+package ServerData;
 
 import Message.Operation;
+import RemoteUserTable.RemoteUserTable;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * Methods for logging in, logging out, registering a new user and add a add a new document to a new user are implemented
  *
- * Server.UserTable extends RemoteServer to make possible the Remote Method Invocation of registerUser
+ * ServerData.UserTable extends RemoteServer to make possible the Remote Method Invocation of registerUser
  *
  * @author Francesco Pirrò - Matr. 544539
  */
@@ -64,7 +65,7 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
      *         Message.Operation.OK if login successful
      * @throws IllegalArgumentException if password and/or username are null
      */
-    public Operation logIn(String username,String password) throws  IllegalArgumentException{
+    /*package*/ Operation logIn(String username,String password) throws  IllegalArgumentException{
         if(username==null) throw new IllegalArgumentException();
         User user=userMap.get(username);
         if(user==null) return Operation.USER_NOT_FOUND;
@@ -72,14 +73,14 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
     }
 
     /**
-     * add a Server.Document to an user
+     * add a ServerData.Document to an user
      * @param username user
      * @param document document to add
      * @return Message.Operation.User_not_found if username is not an existing user,
      *          Message.Operation.User_Already_invited if document has already been added, Message.Operation.OK if successful
      * @throws IllegalArgumentException if username and/or document are null
      */
-    public Operation addDocument(String username,String document) throws IllegalArgumentException{
+    /*package*/ Operation addDocument(String username,String document) throws IllegalArgumentException{
         if(username==null) throw new IllegalArgumentException();
         User user=userMap.get(username);
         if(user==null) return Operation.USER_NOT_FOUND;
@@ -92,7 +93,7 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
      * @return string which contains all documents
      * @throws IllegalArgumentException if username is null
      */
-    public String getList(String username) throws IllegalArgumentException{
+    /*package*/ String getList(String username) throws IllegalArgumentException{
         if(username==null) throw new IllegalArgumentException();
         User user=userMap.get(username);
         if(user==null) return null;
@@ -106,7 +107,7 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
      * @return Message.Operation.OK if successful, Message.Operation.User_already_editing if the user is currently editing another document
      * @throws IllegalArgumentException if username and/or document are null
      */
-    public Operation edit(String username,String document) throws IllegalArgumentException{
+    /*package*/ Operation edit(String username,String document) throws IllegalArgumentException{
         if(username==null) throw new IllegalArgumentException();
         User user=userMap.get(username);
         if(user==null) return Operation.USER_NOT_FOUND;
@@ -117,7 +118,7 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
      * Method to notify the user has stopped editing a document
      * @param username user who stopped editing
      */
-    public void endEdit(String username){
+    /*package*/ void endEdit(String username){
         if(username!=null){
             User user=userMap.get(username);
             if(user!=null) user.endEdit();
@@ -129,7 +130,7 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
      * @param username user to log off
      * @return a string containing the document the user is editing, null if is not editing anything
      */
-    public String logoff(String username){
+    /*package*/ String logoff(String username){
         if(username!=null){
             User user=userMap.get(username);
             if(user!=null) return user.logoff();

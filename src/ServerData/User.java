@@ -1,4 +1,4 @@
-package Server;
+package ServerData;
 
 import Message.Operation;
 
@@ -27,10 +27,10 @@ public class User implements Serializable {
     /**
      * Class constructor
      * @param usr new Username
-     * @param  psw Server.User's password
+     * @param  psw ServerData.User's password
      * @throws IllegalArgumentException if username and/or password are null/empty string
      */
-    public User(String usr,String psw) throws IllegalArgumentException{
+    /*package*/ User(String usr,String psw) throws IllegalArgumentException{
         if(usr==null || psw==null|| usr.compareTo("")==0||psw.compareTo("")==0) throw new IllegalArgumentException();
         username=usr;
         password=psw;
@@ -53,7 +53,7 @@ public class User implements Serializable {
      *         Message.Operation.OK if login successful
      * @throws IllegalArgumentException if psw is null or an empty string
      */
-    public synchronized Operation login(String psw) throws IllegalArgumentException{
+    /*package*/ synchronized Operation login(String psw) throws IllegalArgumentException{
         if (psw==null || psw.compareTo("")==0) throw new IllegalArgumentException();
         else if(loggedIn) return Operation.ALREADY_LOGGED_IN;
         else if(psw.compareTo(password)==0){
@@ -69,7 +69,7 @@ public class User implements Serializable {
      * @return Message.Operation.User_Already_invited if document is already in documentList, Message.Operation.OK if successful
      * @throws IllegalArgumentException if document is null
      */
-    public synchronized Operation addDocument (String Document) throws IllegalArgumentException{
+    /*package*/ synchronized Operation addDocument (String Document) throws IllegalArgumentException{
         if(Document==null) throw new IllegalArgumentException();
         if(documentList.contains(Document)) return Operation.USER_ALREADY_INVITED;
         else{
@@ -82,7 +82,7 @@ public class User implements Serializable {
      * Method to get the list of this user's document
      * @return a string containing all user's document
      */
-    public synchronized String documentList(){
+    /*package*/ synchronized String documentList(){
         StringBuilder list=new StringBuilder();
             for(String doc: documentList){
                 list.append(doc);
@@ -96,7 +96,7 @@ public class User implements Serializable {
      * @param document document currently editing
      * @return result of the operation
      */
-    public synchronized Operation edit(String document) throws IllegalArgumentException{
+    /*package*/ synchronized Operation edit(String document) throws IllegalArgumentException{
         if(document==null) throw new IllegalArgumentException();
         if (editingDocument!=null) return Operation.USER_ALREADY_EDITING;
         else{
@@ -108,7 +108,7 @@ public class User implements Serializable {
     /**
      * Method to notify the user has stopped editing the document
      */
-    public synchronized void endEdit(){
+    /*package*/ synchronized void endEdit(){
         editingDocument=null;
     }
 
@@ -116,7 +116,7 @@ public class User implements Serializable {
      * Method to notify user has logged off
      * @return the document the user is currently editing
      */
-    public synchronized String logoff(){
+    /*package*/ synchronized String logoff(){
         loggedIn=false;
         String doc=editingDocument;
         editingDocument=null;
