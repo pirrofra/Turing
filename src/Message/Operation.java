@@ -1,3 +1,4 @@
+package Message;
 
 import java.util.HashMap;
 
@@ -8,7 +9,7 @@ import java.util.HashMap;
  */
 public enum Operation {
 
-    //TODO: Commenti a Operation
+    //TODO: Commenti a Message.Operation
 
     LOGIN(1),
     CREATE(2),

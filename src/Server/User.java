@@ -1,3 +1,7 @@
+package Server;
+
+import Message.Operation;
+
 import java.io.Serializable;
 import java.util.Vector;
 
@@ -23,7 +27,7 @@ public class User implements Serializable {
     /**
      * Class constructor
      * @param usr new Username
-     * @param  psw User's password
+     * @param  psw Server.User's password
      * @throws IllegalArgumentException if username and/or password are null/empty string
      */
     public User(String usr,String psw) throws IllegalArgumentException{
@@ -45,8 +49,8 @@ public class User implements Serializable {
     /**
      * Method to notify user has logged in if password is correct
      * @param psw password for login
-     * @return Operation.Already_Logged_in if user is already logged in, Operation.Password_incorrect if psw!=user.password
-     *         Operation.OK if login successful
+     * @return Message.Operation.Already_Logged_in if user is already logged in, Message.Operation.Password_incorrect if psw!=user.password
+     *         Message.Operation.OK if login successful
      * @throws IllegalArgumentException if psw is null or an empty string
      */
     public synchronized Operation login(String psw) throws IllegalArgumentException{
@@ -62,7 +66,7 @@ public class User implements Serializable {
     /**
      * add a new document to list of available documents
      * @param Document identifier of the document
-     * @return Operation.User_Already_invited if document is already in documentList, Operation.OK if successful
+     * @return Message.Operation.User_Already_invited if document is already in documentList, Message.Operation.OK if successful
      * @throws IllegalArgumentException if document is null
      */
     public synchronized Operation addDocument (String Document) throws IllegalArgumentException{

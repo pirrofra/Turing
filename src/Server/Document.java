@@ -1,3 +1,8 @@
+package Server;
+
+import Message.MessageBuffer;
+import Message.Operation;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -9,12 +14,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.Vector;
 
 /**
- * This class is used to store basics information about Turing's Document
+ * This class is used to store basics information about Turing's Server.Document
  * such as the creator, user invited, number of sections, path locations of all sections and user currently editing
  *
  * currentEdited keeps track of free sections - if currentEdited[i] is null, the section i+1 is free to be edited
  * sectionPath is used to store the paths of the various section of the file
- * Constructor is private, to create an instance of Document is used the static method createDocument
+ * Constructor is private, to create an instance of Server.Document is used the static method createDocument
  * private method initialize create one empty file for each section and it makes sure the path is complete
  *
  * This class uses NIO to manages files.
@@ -66,12 +71,12 @@ public class Document implements Serializable {
     }
 
     /**
-     * Static Method used to generate new Document
-     * @param docName Document name
+     * Static Method used to generate new Server.Document
+     * @param docName Server.Document name
      * @param userCreator user who created the document
      * @param sections number of sections
      * @param Path directory where all documents are stored
-     * @return new Document
+     * @return new Server.Document
      * @throws IllegalArgumentException if docName and/or userCreator are null and if sections in 0 or less
      * @throws IOException if an error occurs during newDoc.initialize
      */
@@ -85,7 +90,7 @@ public class Document implements Serializable {
     /**
      * Private method used to add a new user in the list of invited users
      * @param user user to add
-     * @return Operation.User_Already_Invited if the user is already in the list or Operation.OK if successful
+     * @return Message.Operation.User_Already_Invited if the user is already in the list or Message.Operation.OK if successful
      */
     private Operation addUser(String user){
         if(userInvited.contains(user)) return Operation.USER_ALREADY_INVITED;
@@ -112,7 +117,7 @@ public class Document implements Serializable {
      * @param username user who requested the edit
      * @throws IllegalArgumentException if section is 0 or more than numSection and/or if username is null
      * @throws IOException if an error occurs during I/O operations
-     * @return MessageBuffer containing result and filebuffer
+     * @return Message.MessageBuffer containing result and filebuffer
      */
     public synchronized MessageBuffer edit(int section,String username) throws IllegalArgumentException,IOException{
         if(section>numSection||section<1||username==null) throw new IllegalArgumentException();
@@ -167,9 +172,9 @@ public class Document implements Serializable {
      * the section is updated with new file
      * @param section section wanted to be edited
      * @param username user who requested the end edit
-     * @return Operation.Document_Not_Found if the user has not been invited
-     *         Operation.Editing_Not_Requested if the user has not requested an editing of this section
-     *         Operation.OK if successful
+     * @return Message.Operation.Document_Not_Found if the user has not been invited
+     *         Message.Operation.Editing_Not_Requested if the user has not requested an editing of this section
+     *         Message.Operation.OK if successful
      * @throws IllegalArgumentException if section is 0 or more than numSection and/or if username is null
      * @throws IOException if an error occurs during I/O operations
      */
@@ -189,9 +194,9 @@ public class Document implements Serializable {
      * Method to approve an invite sent by an inviter to an invited
      * @param inviter user who sent the invite request
      * @param invited user who inviter wants to grant access to the file to
-     * @return Operation.Permission_Denied if inviter is not the creator
-     *         Operation.User_Already_Added if the user has been already invited
-     *         Operation.OK if successful
+     * @return Message.Operation.Permission_Denied if inviter is not the creator
+     *         Message.Operation.User_Already_Added if the user has been already invited
+     *         Message.Operation.OK if successful
      * @throws IllegalArgumentException if inviter and/or invited are null
      */
     public synchronized Operation invite(String inviter,String invited) throws IllegalArgumentException{

@@ -1,15 +1,20 @@
+package Server;
+
+import Message.MessageBuffer;
+import Message.Operation;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class is used to store all documents' data
- * single Document's data are stored in instances of Document class
+ * single Server.Document's data are stored in instances of Server.Document class
  *
  * Method for creating document, showing document, inviting new user and requesting an edit/end_edit are implemented
  *
- * Method show and edit returns a MessageBuffer, ready to be sent using a SocketChannel
- * All others method simply return a Operation type which describes the result of the request.
+ * Method show and edit returns a Message.MessageBuffer, ready to be sent using a SocketChannel
+ * All others method simply return a Message.Operation type which describes the result of the request.
  *
  * @author Francesco Pirrò - Matr. 544539
  */
@@ -47,9 +52,9 @@ public class DocTable implements Serializable {
      * @param name new document name
      * @param creator user who is creating new document
      * @param numSections number of sections this document has
-     * @return Operation.FAIL if an I/0 Error occurs
-     *         Operation.Name_not_available if the name is not available
-     *         Operation.OK if successful
+     * @return Message.Operation.FAIL if an I/0 Error occurs
+     *         Message.Operation.Name_not_available if the name is not available
+     *         Message.Operation.OK if successful
      * @throws IllegalArgumentException if name and/or creator are null or numsections is zero or less
      */
     public Operation createDocument(String name, String creator, int numSections) throws IllegalArgumentException{
@@ -69,9 +74,9 @@ public class DocTable implements Serializable {
      * @param document document the user invited should edit
      * @param inviter user who sent the invite request
      * @param invited user who need to be added
-     * @return Operation.Document_Not_Found if the document doesn't exist or the inviter doesn't have permission to add
-     *         Operation.User_already_invited if the user has already been invited
-     *         Operation.Ok if successful
+     * @return Message.Operation.Document_Not_Found if the document doesn't exist or the inviter doesn't have permission to add
+     *         Message.Operation.User_already_invited if the user has already been invited
+     *         Message.Operation.Ok if successful
      * @throws IllegalArgumentException if document, inviter and/or invited are null
      */
     public Operation invite(String document, String inviter,String invited) throws IllegalArgumentException{
@@ -86,7 +91,7 @@ public class DocTable implements Serializable {
      * @param document document wanted to be edited
      * @param user user who wants to edit document
      * @param section section wanted to be edited
-     * @return MessageBuffer containing the result of the operation and the section content if successful
+     * @return Message.MessageBuffer containing the result of the operation and the section content if successful
      *         a generic fail error is sent if an i/o error occurs
      * @throws IllegalArgumentException if document or user are null or section is not an existing section number
      */
@@ -110,10 +115,10 @@ public class DocTable implements Serializable {
      * @param user user who sent the request
      * @param section section modified
      * @param file byte array containing updated section
-     * @return Operation.Document_Not_Found if the user has not been invited to edit document or if document doesn't exist
-     *         Operation.Editing_Not_Request if the user didn't make an edit request first
-     *         Operation.Fail if an I/O error occurs
-     *         Operation.OK if successful
+     * @return Message.Operation.Document_Not_Found if the user has not been invited to edit document or if document doesn't exist
+     *         Message.Operation.Editing_Not_Request if the user didn't make an edit request first
+     *         Message.Operation.Fail if an I/O error occurs
+     *         Message.Operation.OK if successful
      * @throws IllegalArgumentException if document or user are null, section is not an existing section number or file is null
      */
     public Operation endEdit(String document,String user,int section, byte[] file) throws IllegalArgumentException{
@@ -131,10 +136,10 @@ public class DocTable implements Serializable {
     }
 
     /**
-     * Method to receive the entire document in a MessageBuffer
+     * Method to receive the entire document in a Message.MessageBuffer
      * @param document document wanted to be shown
      * @param user user who sent the request
-     * @return MessageBuffer containing the result and the entire document if successful
+     * @return Message.MessageBuffer containing the result and the entire document if successful
      *         a generic Fail error is sent if an I/0 error occurs
      * @throws IllegalArgumentException if document and/or user are null
      */
@@ -153,11 +158,11 @@ public class DocTable implements Serializable {
     }
 
     /**
-     * Method to receive a section in a MessageBuffer
+     * Method to receive a section in a Message.MessageBuffer
      * @param document document wanted to be shown
      * @param user user who sent the request
      * @param section section wanted to be shown
-     * @return MessageBuffer containing the result and the entire document if successful
+     * @return Message.MessageBuffer containing the result and the entire document if successful
      *         a generic Fail error is sent if an I/0 error occurs
      * @throws IllegalArgumentException if document and/or user are null and section is not a valid section number
      */

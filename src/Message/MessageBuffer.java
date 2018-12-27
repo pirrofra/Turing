@@ -1,3 +1,5 @@
+package Message;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -6,13 +8,13 @@ import java.util.Vector;
 /**
  * This class is used to define the format of messages exchanged between server and clients
  * The Message is made of an header and a body.
- * The Header contains two integers: one identifies the correct Operation enum and the second one is the length of the body
+ * The Header contains two integers: one identifies the correct Message.Operation enum and the second one is the length of the body
  * The body is made of different arguments, depending on the type of message
  * Each argument is made of an integer which define the length of the argument, and the actual argument as a byte array.
  * Until all byte specified in the message header are read, new arguments are found.
  *
  * Method to read and write messages from and to the socket are implemented in this class too.
- * Constructor is private, and actual MessageBuffer instances are to be obtained from a socket or with the static Method CreateBufferMessage
+ * Constructor is private, and actual Message.MessageBuffer instances are to be obtained from a socket or with the static Method CreateBufferMessage
  * Arguments are returned as byte array in a vector.
  *
  * @author Francesco Pirrò - Matr. 5445390
@@ -41,10 +43,10 @@ public class MessageBuffer {
     }
 
     /**
-     * Static Method to generate MessageBuffer
+     * Static Method to generate Message.MessageBuffer
      * @param operation message type
      * @param Args multiple arguments passed as byte array
-     * @return MessageBuffer ready to be sent
+     * @return Message.MessageBuffer ready to be sent
      */
     public static MessageBuffer createMessageBuffer(Operation operation, byte[]... Args){
         int dim=0;
@@ -64,10 +66,10 @@ public class MessageBuffer {
     }
 
     /**
-     * Static Method to generate MessageBuffer
+     * Static Method to generate Message.MessageBuffer
      * @param operation message type
      * @param file ByteBuffer used for the message body
-     * @return a MessageBuffer ready to be sent if operation is Operation.OK or Operation.End_Edit, null otherwise
+     * @return a Message.MessageBuffer ready to be sent if operation is Message.Operation.OK or Message.Operation.End_Edit, null otherwise
      */
     public static MessageBuffer createMessageBuffer(Operation operation, ByteBuffer file){
         if(operation!=Operation.OK && operation!=Operation.END_EDIT) return null;
@@ -140,7 +142,7 @@ public class MessageBuffer {
 
     /**
      * Getter for OP
-     * @return MessageBuffer Operation
+     * @return Message.MessageBuffer Message.Operation
      */
     public Operation getOP(){
         return OP;

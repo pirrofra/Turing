@@ -1,3 +1,5 @@
+package Server;
+
 public class TuringServer {
     //TODO: file config
     private static final int numThreads=8;

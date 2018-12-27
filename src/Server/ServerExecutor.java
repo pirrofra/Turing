@@ -1,3 +1,8 @@
+package Server;
+
+import Message.MessageBuffer;
+import Message.Operation;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
