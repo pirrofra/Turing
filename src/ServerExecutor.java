@@ -1,6 +1,4 @@
-import javax.crypto.AEADBadTagException;
 import java.io.IOException;
-import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Vector;
@@ -49,6 +47,7 @@ public class ServerExecutor implements Runnable {
         String docName=new String(Args.get(0));
         String invited=new String(Args.get(1));
         Operation result=documents.invite(docName,user,invited);
+        if(result==Operation.OK) users.addDocument(user,docName);
         return MessageBuffer.createMessageBuffer(result);
     }
 
