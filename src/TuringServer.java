@@ -112,10 +112,14 @@ public class TuringServer {
 
    private static void setProperties() throws IOException{
         try{
-            config.load(new FileInputStream("config.ini"));
+            FileInputStream input=new FileInputStream("config.ini");
+            config.load(input);
+            input.close();
         }
         catch (FileNotFoundException e){
-            defaultConfig.store(new FileOutputStream("config.ini", false),"");
+            FileOutputStream output=new FileOutputStream("config.ini",false);
+            defaultConfig.store(output,"DEFAULT VALUES");
+            output.close();
         }
        dirPath=config.getProperty("dirPath");
        bakPath=config.getProperty("bakPath");
