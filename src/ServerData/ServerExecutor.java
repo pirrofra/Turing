@@ -37,20 +37,16 @@ public class ServerExecutor implements Runnable {
        return MessageBuffer.createMessageBuffer(result);
     }
 
-    private MessageBuffer create(Vector<byte[]> Args) throws IllegalArgumentException{
+    private MessageBuffer create(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=2) throw new IllegalArgumentException();
-        String user=connectedUsers.get(socket);
-        if(user==null) return MessageBuffer.createMessageBuffer(Operation.CLIENT_NOT_LOGGED_IN);
         String docName=new String(Args.get(0));
         int numSection= ByteBuffer.wrap(Args.get(1)).getInt();
         Operation result=documents.createDocument(docName,user,numSection);
         return MessageBuffer.createMessageBuffer(result);
     }
 
-    private MessageBuffer invite( Vector<byte[]> Args) throws  IllegalArgumentException{
+    private MessageBuffer invite( Vector<byte[]> Args,String user) throws  IllegalArgumentException{
         if(Args.size()!=2) throw new IllegalArgumentException();
-        String user=connectedUsers.get(socket);
-        if(user==null) return  MessageBuffer.createMessageBuffer(Operation.CLIENT_NOT_LOGGED_IN);
         String docName=new String(Args.get(0));
         String invited=new String(Args.get(1));
         Operation result=documents.invite(docName,user,invited);
@@ -58,18 +54,14 @@ public class ServerExecutor implements Runnable {
         return MessageBuffer.createMessageBuffer(result);
     }
 
-    private MessageBuffer list(Vector<byte[]> Args) throws IllegalArgumentException{
+    private MessageBuffer list(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=0) throw new IllegalArgumentException();
-        String user=connectedUsers.get(socket);
-        if(user==null) return  MessageBuffer.createMessageBuffer(Operation.CLIENT_NOT_LOGGED_IN);
         String docList=users.getList(user);
         return MessageBuffer.createMessageBuffer(Operation.OK,docList.getBytes());
     }
 
-    private MessageBuffer show(Vector<byte[]>Args) throws IllegalArgumentException{
+    private MessageBuffer show(Vector<byte[]>Args,String user) throws IllegalArgumentException{
         if(Args.size()<1||Args.size()>2) throw new IllegalArgumentException();
-        String user=connectedUsers.get(socket);
-        if(user==null) return MessageBuffer.createMessageBuffer(Operation.CLIENT_NOT_LOGGED_IN);
         String docName=new String(Args.get(0));
         if(Args.size()==1) return documents.show(docName,user);
         else{
@@ -78,10 +70,8 @@ public class ServerExecutor implements Runnable {
         }
     }
 
-    private MessageBuffer edit(Vector<byte[]> Args) throws IllegalArgumentException{
+    private MessageBuffer edit(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=2) throw new IllegalArgumentException();
-        String user=connectedUsers.get(socket);
-        if(user==null) return MessageBuffer.createMessageBuffer(Operation.CLIENT_NOT_LOGGED_IN);
         String docName=new String(Args.get(0));
         int section=ByteBuffer.wrap(Args.get(1)).getInt();
         Operation result=users.edit(user,docName);
@@ -92,10 +82,8 @@ public class ServerExecutor implements Runnable {
         }
     }
 
-    private MessageBuffer end_edit(Vector<byte[]> Args) throws IllegalArgumentException{
+    private MessageBuffer end_edit(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=3) throw new IllegalArgumentException();
-        String user=connectedUsers.get(socket);
-        if(user==null) return MessageBuffer.createMessageBuffer(Operation.CLIENT_NOT_LOGGED_IN);
         String docName=new String(Args.get(0));
         int section=ByteBuffer.wrap(Args.get(1)).getInt();
         Operation result=documents.endEdit(docName,user,section,Args.get(2));
@@ -111,27 +99,41 @@ public class ServerExecutor implements Runnable {
         }
     }
 
-    private MessageBuffer execute(MessageBuffer msg){
+    private MessageBuffer execute(MessageBuffer msg)throws IOException{
         Vector<byte[]> Args=msg.getArgs();
         MessageBuffer reply;
+        String user=connectedUsers.get(socket);
+        if(msg.getOP()!=Operation.LOGIN && user==null) return MessageBuffer.createMessageBuffer(Operation.CLIENT_NOT_LOGGED_IN);
         try{
             switch (msg.getOP()){
-                case LOGIN: reply=login(Args);
-                break;
-                case CREATE: reply=create(Args);
-                break;
-                case SHOW: reply=show(Args);
-                break;
-                case LIST: reply=list(Args);
-                break;
-                case INVITE: reply=invite(Args);
-                break;
-                case EDIT: reply=edit(Args);
-                break;
-                case END_EDIT: reply=end_edit(Args);
-                break;
-                default:reply=MessageBuffer.createMessageBuffer(Operation.INVALID_REQUEST);
-                break;
+                case LOGIN: System.out.println("Login request received from "+socket.getRemoteAddress().toString());
+                    reply=login(Args);
+                    break;
+                case CREATE: System.out.println("Create Document request received from "+user);
+                    reply=create(Args,user);
+                    break;
+                case SHOW:  System.out.println("Show Document request received from "+user);
+                    reply=show(Args,user);
+                    break;
+                case LIST:  System.out.println("List received from "+user);
+                    reply=list(Args,user);
+                    break;
+                case INVITE:  System.out.println("Invite request received from "+user);
+                    reply=invite(Args,user);
+                    break;
+                case EDIT:  System.out.println("Edit Document request received from "+user);
+                    reply=edit(Args,user);
+                    break;
+                case END_EDIT:  System.out.println("End EDit Document request received from "+user);
+                    reply=end_edit(Args,user);
+                    break;
+                case LOGOUT:  System.out.println("Logout request received from "+user);
+                    reply=MessageBuffer.createMessageBuffer(Operation.OK);
+                    logout();
+                    break;
+                default: System.out.println("Invalid request received from "+user);
+                    reply=MessageBuffer.createMessageBuffer(Operation.INVALID_REQUEST);
+                    break;
             }
         }catch (IllegalArgumentException e){
             reply=MessageBuffer.createMessageBuffer(Operation.REQUEST_INCOMPLETE);
@@ -149,6 +151,7 @@ public class ServerExecutor implements Runnable {
         catch (IOException |InterruptedException e){
             logout();
             try {
+                System.out.println("Connection ended with "+socket.getRemoteAddress().toString());
                 socket.close();
             } catch (IOException e1) {
                 e1.printStackTrace();

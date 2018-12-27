@@ -18,6 +18,7 @@ public enum Operation {
     INVITE(5),
     EDIT(6),
     END_EDIT(7),
+    LOGOUT(8),
     //--- REQUEST --- //
     OK(0),
     FAIL(-1),
