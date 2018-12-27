@@ -16,6 +16,8 @@ import java.util.concurrent.*;
 
 public class TuringServer {
     //TODO: file config
+    //TODO: Commenti
+
     private static final int numThreads=8;
     private static final String dirPath="files/";
     private static final String bakPath="bak/";
