@@ -1,17 +1,33 @@
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Vector;
 
+/**
+ * This class is used to define the format of messages exchanged between server and clients
+ * The Message is made of an header and a body.
+ * The Header contains two integers: one identifies the correct Operation enum and the second one is the length of the body
+ * The body is made of different arguments, depending on the type of message
+ * Each argument is made of an integer which define the length of the argument, and the actual argument as a byte array.
+ * Until all byte specified in the message header are read, new arguments are found.
+ *
+ * Method to read and write messages from and to the socket are implemented in this class too.
+ * Constructor is private, and actual MessageBuffer instances are to be obtained from a socket or with the static Method CreateBufferMessage
+ * Arguments are returned as byte array in a vector.
+ *
+ * @author Francesco Pirrò - Matr. 5445390
+ */
 public class MessageBuffer {
-
-    //TODO: COMMENTI A MESSAGEBUFFER
 
     private Operation OP;
     private int dimension;
     private ByteBuffer body;
 
+    /**
+     * Private class constructor
+     * @param operation message type
+     * @param buff ByteBuffer with message body
+     */
     private MessageBuffer(Operation operation, ByteBuffer buff){
         OP=operation;
         if(buff==null){
@@ -24,6 +40,12 @@ public class MessageBuffer {
         }
     }
 
+    /**
+     * Static Method to generate MessageBuffer
+     * @param operation message type
+     * @param Args multiple arguments passed as byte array
+     * @return MessageBuffer ready to be sent
+     */
     public static MessageBuffer createMessageBuffer(Operation operation, byte[]... Args){
         int dim=0;
         ByteBuffer body=null;
@@ -41,11 +63,23 @@ public class MessageBuffer {
         return new MessageBuffer(operation,body);
     }
 
+    /**
+     * Static Method to generate MessageBuffer
+     * @param operation message type
+     * @param file ByteBuffer used for the message body
+     * @return a MessageBuffer ready to be sent if operation is Operation.OK or Operation.End_Edit, null otherwise
+     */
     public static MessageBuffer createMessageBuffer(Operation operation, ByteBuffer file){
         if(operation!=Operation.OK && operation!=Operation.END_EDIT) return null;
         else return new MessageBuffer(operation,file);
     }
 
+    /**
+     * Static Method to read a Message from a socketChannel
+     * @param socket SocketChannel from where the message has to be read
+     * @return Message read
+     * @throws IOException if an error occurs during i/o operations
+     */
     public static MessageBuffer readMessage(SocketChannel socket) throws IOException{
         ByteBuffer header=ByteBuffer.allocate(8);
         read(socket,header,8);
@@ -59,7 +93,11 @@ public class MessageBuffer {
         return new MessageBuffer(op,body);
     }
 
-
+    /**
+     * Method to send this message to a socket
+     * @param socket SocketChannel to use to send this message
+     * @throws IOException if an error occurs during i/o operations
+     */
     public void sendMessage(SocketChannel socket) throws IOException{
         ByteBuffer header=ByteBuffer.allocate(8);
         header.putInt(OP.value);
@@ -70,6 +108,13 @@ public class MessageBuffer {
         body.flip();
     }
 
+    /**
+     * Static Method used to read data from a socketchanell
+     * @param socket SocketChannel to read from
+     * @param buff ByteBuffer to use to store new data
+     * @param size number of byte to read from the socket
+     * @throws IOException if an error occurs during i/o operations
+     */
     private static void read(SocketChannel socket, ByteBuffer buff,int size) throws IOException {
         while(size>0){
             int byte_read= socket.read(buff);
@@ -78,6 +123,13 @@ public class MessageBuffer {
         }
     }
 
+    /**
+     * Static Method used to write data in a socketchannel
+     * @param socket socketchannel to write to
+     * @param buff ByteBuffer containing data to write
+     * @param size number of byte to write to the socket
+     * @throws IOException if an error occurs during i/o operations
+     */
     private static void write(SocketChannel socket, ByteBuffer buff, int size) throws IOException{
         while(size>0){
             int byte_wrote= socket.write(buff);
@@ -86,10 +138,18 @@ public class MessageBuffer {
         }
     }
 
+    /**
+     * Getter for OP
+     * @return MessageBuffer Operation
+     */
     public Operation getOP(){
         return OP;
     }
 
+    /**
+     * Method which read from the buffer and store all data in buffer in a Vector
+     * @return Vector of byte array
+     */
     public Vector<byte[]> getArgs(){
         if(body==null) return null;
         Vector<byte[]> argsVector=new Vector<>();

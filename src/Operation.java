@@ -16,7 +16,7 @@ public enum Operation {
     INVITE(5),
     EDIT(6),
     END_EDIT(7),
-    //--- REQUEST ---
+    //--- REQUEST --- //
     OK(0),
     FAIL(-1),
     NAME_NOT_AVAILABLE(-2),
@@ -28,8 +28,9 @@ public enum Operation {
     USER_NOT_FOUND(-8),
     USER_ALREADY_INVITED(-9),
     PERMISSION_DENIED(-10),
-    FILE_TOO_BIG(-11);
-    //--- RESPONSE ---
+    FILE_TOO_BIG(-11),
+    REQUEST_INCOMPLETE(-12);
+    // --- RESPONSE --- //
 
     int value;
     private static HashMap<Integer,Operation> map=new HashMap<>();
