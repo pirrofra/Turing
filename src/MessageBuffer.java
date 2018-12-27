@@ -124,8 +124,8 @@ public class MessageBuffer {
     }
 
     /**
-     * Static Method used to write data in a socketchannel
-     * @param socket socketchannel to write to
+     * Static Method used to write data in a socketChannel
+     * @param socket socketChannel to write to
      * @param buff ByteBuffer containing data to write
      * @param size number of byte to write to the socket
      * @throws IOException if an error occurs during i/o operations

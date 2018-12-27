@@ -18,10 +18,10 @@ public class DocTable implements Serializable {
     private ConcurrentHashMap<String,Document> docMap;
     private String docPath;
 
-    //TODO:Show anche per la singola Sezione
     //TODO:Show deve anche indicare chi sta editando le sezioni
     //TODO:Lista e Show devono dire il numero di sezioni in cui il file è diviso
     //TODO:Serializzazione
+    //TODO:Al logout chiudi l'edit se è aperto
     /**
      * Class Constructor with no parameter for ConcurrentHashMap
      * @param path path where to store all documents' sections
@@ -146,6 +146,29 @@ public class DocTable implements Serializable {
         else {
             try{
                 return doc.show(user);
+            }
+            catch (IOException e){
+                return MessageBuffer.createMessageBuffer(Operation.FAIL);
+            }
+        }
+    }
+
+    /**
+     * Method to receive a section in a MessageBuffer
+     * @param document document wanted to be shown
+     * @param user user who sent the request
+     * @param section section wanted to be shown
+     * @return MessageBuffer containing the result and the entire document if successful
+     *         a generic Fail error is sent if an I/0 error occurs
+     * @throws IllegalArgumentException if document and/or user are null and section is not a valid section number
+     */
+    public MessageBuffer show(String document,String user,int section) throws IllegalArgumentException{
+        if(document==null) throw new IllegalArgumentException();
+        Document doc=docMap.get(document);
+        if(doc==null) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
+        else {
+            try{
+                return doc.show(user,section);
             }
             catch (IOException e){
                 return MessageBuffer.createMessageBuffer(Operation.FAIL);

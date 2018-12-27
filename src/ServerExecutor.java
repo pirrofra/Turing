@@ -62,11 +62,15 @@ public class ServerExecutor implements Runnable {
     }
 
     private MessageBuffer show(Vector<byte[]>Args) throws IllegalArgumentException{
-        if(Args.size()!=1) throw new IllegalArgumentException();
+        if(Args.size()<1||Args.size()>2) throw new IllegalArgumentException();
         String user=connectedUsers.get(socket);
         if(user==null) return MessageBuffer.createMessageBuffer(Operation.CLIENT_NOT_LOGGED_IN);
         String docName=new String(Args.get(0));
-        return documents.show(docName,user);
+        if(Args.size()==1) return documents.show(docName,user);
+        else{
+            int section=ByteBuffer.wrap(Args.get(1)).getInt();
+            return documents.show(docName,user,section);
+        }
     }
 
     private MessageBuffer edit(Vector<byte[]> Args) throws IllegalArgumentException{

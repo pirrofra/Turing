@@ -146,7 +146,20 @@ public class Document implements Serializable {
         }
         completeDocument.flip();
         return MessageBuffer.createMessageBuffer(Operation.OK,completeDocument);
+    }
 
+    /**
+     * Method to show a single section of a document
+     * @param username user who requested the section
+     * @param section section to be shown
+     * @return messageBuffer containing the section if successful
+     * @throws IllegalArgumentException if section is not a valid section number or username is null
+     */
+    public synchronized MessageBuffer show(String username,int section) throws IllegalArgumentException,IOException{
+        if(section>numSection||section<1||username==null) throw new IllegalArgumentException();
+        else if(!userInvited.contains(username)) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
+        ByteBuffer file=openFile(sectionPath[section-1]);
+        return MessageBuffer.createMessageBuffer(Operation.OK,file);
     }
 
     /**
