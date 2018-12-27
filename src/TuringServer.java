@@ -112,12 +112,12 @@ public class TuringServer {
 
    private static void setProperties() throws IOException{
         try{
-            FileInputStream input=new FileInputStream("config.ini");
+            FileInputStream input=new FileInputStream("serverConfig.ini");
             config.load(input);
             input.close();
         }
         catch (FileNotFoundException e){
-            FileOutputStream output=new FileOutputStream("config.ini",false);
+            FileOutputStream output=new FileOutputStream("severConfig.ini",false);
             defaultConfig.store(output,"DEFAULT VALUES");
             output.close();
         }
@@ -137,6 +137,7 @@ public class TuringServer {
        defaultConfig.setProperty("portRMI","55431");
        defaultConfig.setProperty("timeout","1000");
    }
+
    private static int getIntegerProperty(String key){
        try{
            return Integer.parseInt(config.getProperty(key));
