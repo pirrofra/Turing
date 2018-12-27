@@ -1,3 +1,8 @@
+import RemoteUserTable.RemoteUserTable;
+import ServerData.ServerData;
+
+import java.rmi.RemoteException;
+
 public class TuringServer {
     //TODO: file config
     private static final int numThreads=8;
@@ -6,7 +11,14 @@ public class TuringServer {
     private static final int portRMI=55431;
     private static final int portTCP=55432;
 
-    public static void main(String[] args){
+    private static ServerData data;
 
+    public static void main(String[] args){
+        try {
+            data=ServerData.createServerData(dirPath,portRMI);
+        }
+        catch (RemoteException e){
+            e.printStackTrace();
+        }
     }
 }

@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
     //TODO:Show deve anche indicare chi sta editando le sezioni
     //TODO:Lista deve indicare il numero di sezioni e i possibili editor
-    //TODO:Serializzazione
+
     /**
      * Class Constructor with no parameter for ConcurrentHashMap
      * @param path path where to store all documents' sections
