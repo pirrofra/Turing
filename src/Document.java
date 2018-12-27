@@ -212,6 +212,18 @@ public class Document implements Serializable {
     }
 
     /**
+     * Method to notify the user has stopped editing without saving any content
+     * @param user user who stopped editing
+     */
+    public synchronized void abruptStop(String user){
+        if(user!=null){
+            for(int i=0;i<numSection;i++){
+                if(currentEdited[i]!=null && currentEdited[i].compareTo(user)==0) currentEdited[i]=null;
+            }
+        }
+    }
+
+    /**
      * Static method to save an array byte in a file
      * @param path path of the file where to save
      * @param file content to save

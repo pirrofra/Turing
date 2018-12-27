@@ -18,6 +18,7 @@ public class User implements Serializable {
     private String password;
     private Vector<String> documentList;
     private boolean loggedIn;
+    private String editingDocument;
 
     /**
      * Class constructor
@@ -30,6 +31,7 @@ public class User implements Serializable {
         username=usr;
         password=psw;
         documentList=new Vector<>();
+        editingDocument=null;
     }
 
     /**
@@ -86,9 +88,34 @@ public class User implements Serializable {
     }
 
     /**
-     * Method to notify user has logged off
+     * Method to notify which document the user is editing
+     * @param document document currently editing
+     * @return result of the operation
      */
-    public synchronized void logoff(){
+    public synchronized Operation edit(String document) throws IllegalArgumentException{
+        if(document==null) throw new IllegalArgumentException();
+        if (editingDocument!=null) return Operation.USER_ALREADY_EDITING;
+        else{
+            editingDocument=document;
+            return Operation.OK;
+        }
+    }
+
+    /**
+     * Method to notify the user has stopped editing the document
+     */
+    public synchronized void endEdit(){
+        editingDocument=null;
+    }
+
+    /**
+     * Method to notify user has logged off
+     * @return the document the user is currently editing
+     */
+    public synchronized String logoff(){
         loggedIn=false;
+        String doc=editingDocument;
+        editingDocument=null;
+        return doc;
     }
 }

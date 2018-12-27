@@ -97,13 +97,40 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
     }
 
     /**
-     * Method to log off an user
-     * @param username user to log off
+     * Method to notify the user is editing a document
+     * @param username user who is currently editing the document
+     * @param document document currently edited
+     * @return Operation.OK if successful, Operation.User_already_editing if the user is currently editing another document
+     * @throws IllegalArgumentException if username and/or document are null
      */
-    public void logoff(String username){
+    public Operation edit(String username,String document) throws IllegalArgumentException{
+        if(username==null) throw new IllegalArgumentException();
+        User user=userMap.get(username);
+        if(user==null) return Operation.USER_NOT_FOUND;
+        else return user.edit(document);
+    }
+
+    /**
+     * Method to notify the user has stopped editing a document
+     * @param username user who stopped editing
+     */
+    public void endEdit(String username){
         if(username!=null){
             User user=userMap.get(username);
-            if(user!=null) user.logoff();
+            if(user!=null) user.endEdit();
         }
+    }
+
+    /**
+     * Method to log off an user
+     * @param username user to log off
+     * @return a string containing the document the user is editing, null if is not editing anything
+     */
+    public String logoff(String username){
+        if(username!=null){
+            User user=userMap.get(username);
+            if(user!=null) return user.logoff();
+        }
+        return null;
     }
 }

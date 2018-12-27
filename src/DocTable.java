@@ -176,6 +176,20 @@ public class DocTable implements Serializable {
         }
     }
 
+    /**
+     * Method to notify the user has stopped editing without saving any content
+     * @param document document stopped to be edited
+     * @param username username who stopped editing
+     */
+    public void abruptStop(String document,String username){
+        if(document!=null){
+            Document doc=docMap.get(document);
+            if(doc!=null){
+                doc.abruptStop(username);
+            }
+        }
+    }
+
 
 
 }

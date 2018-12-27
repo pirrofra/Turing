@@ -79,7 +79,12 @@ public class ServerExecutor implements Runnable {
         if(user==null) return MessageBuffer.createMessageBuffer(Operation.CLIENT_NOT_LOGGED_IN);
         String docName=new String(Args.get(0));
         int section=ByteBuffer.wrap(Args.get(1)).getInt();
-        return documents.edit(docName,user,section);
+        Operation result=users.edit(user,docName);
+        if(result==Operation.OK) return documents.edit(docName,user,section);
+        else{
+            users.endEdit(user);
+            return MessageBuffer.createMessageBuffer(result);
+        }
     }
 
     private MessageBuffer end_edit(Vector<byte[]> Args) throws IllegalArgumentException{
@@ -89,12 +94,16 @@ public class ServerExecutor implements Runnable {
         String docName=new String(Args.get(0));
         int section=ByteBuffer.wrap(Args.get(1)).getInt();
         Operation result=documents.endEdit(docName,user,section,Args.get(2));
+        users.endEdit(user);
         return MessageBuffer.createMessageBuffer(result);
     }
 
     private void logout(){
         String user=connectedUsers.remove(socket);
-        if(user!=null) users.logoff(user);
+        if(user!=null)  {
+            String doc=users.logoff(user);
+            if(doc!=null) documents.abruptStop(doc,user);
+        }
     }
 
     private MessageBuffer execute(MessageBuffer msg){
