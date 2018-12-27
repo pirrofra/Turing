@@ -12,14 +12,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerExecutor implements Runnable {
 
-    //TODO:Commenti
-
     private UserTable users;
     private DocumentTable documents;
     private SocketChannel socket;
     private ConcurrentHashMap<SocketChannel,String> connectedUsers;
     private BlockingQueue<SocketChannel> selectorKeys;
 
+    /**
+     * Public class constructor
+     * @param data ServerData containing all server information
+     * @param sock Socket from where the request is happening
+     * @param queue queue containing all sockets needed to be register for the selector, again
+     */
     public ServerExecutor(ServerData data, SocketChannel sock, BlockingQueue<SocketChannel> queue){
         users=data.getUserTable();
         documents=data.getDocumentTable();
@@ -28,6 +32,12 @@ public class ServerExecutor implements Runnable {
         selectorKeys=queue;
     }
 
+    /**
+     * Method to correctly execute a login in the service
+     * @param Args Message arguments
+     * @return reply message
+     * @throws IllegalArgumentException if the message is incomplete or invalid
+     */
     private MessageBuffer login(Vector<byte[]> Args) throws IllegalArgumentException{
        if(Args.size()!=2) throw new IllegalArgumentException();
        String username=new String(Args.get(0));
@@ -37,6 +47,13 @@ public class ServerExecutor implements Runnable {
        return MessageBuffer.createMessageBuffer(result);
     }
 
+    /**
+     * Method to create a new document
+     * @param Args Message arguments
+     * @param user user who sent the request
+     * @return reply message
+     * @throws IllegalArgumentException if the message is incomplete or invalid
+     */
     private MessageBuffer create(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=2) throw new IllegalArgumentException();
         String docName=new String(Args.get(0));
@@ -45,6 +62,13 @@ public class ServerExecutor implements Runnable {
         return MessageBuffer.createMessageBuffer(result);
     }
 
+    /**
+     * Method to correctly execute an invite request
+     * @param Args Message arguments
+     * @param user user who sent the request
+     * @return reply message
+     * @throws IllegalArgumentException if the message is incomplete or invalid
+     */
     private MessageBuffer invite( Vector<byte[]> Args,String user) throws  IllegalArgumentException{
         if(Args.size()!=2) throw new IllegalArgumentException();
         String docName=new String(Args.get(0));
@@ -54,12 +78,26 @@ public class ServerExecutor implements Runnable {
         return MessageBuffer.createMessageBuffer(result);
     }
 
+    /**
+     * Method to correctly send a list to the user
+     * @param Args Message arguments
+     * @param user user who sent the request
+     * @return reply message
+     * @throws IllegalArgumentException if the message is incomplete or invalid
+     */
     private MessageBuffer list(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=0) throw new IllegalArgumentException();
         String docList=users.getList(user);
         return MessageBuffer.createMessageBuffer(Operation.OK,docList.getBytes());
     }
 
+    /**
+     * Method to correctly show the user the all document/only a section
+     * @param Args Message arguments
+     * @param user user who sent the request
+     * @return reply message
+     * @throws IllegalArgumentException if the message is incomplete or invalid
+     */
     private MessageBuffer show(Vector<byte[]>Args,String user) throws IllegalArgumentException{
         if(Args.size()<1||Args.size()>2) throw new IllegalArgumentException();
         String docName=new String(Args.get(0));
@@ -70,6 +108,13 @@ public class ServerExecutor implements Runnable {
         }
     }
 
+    /**
+     * Method to execute an edit request for a document in the service
+     * @param Args Message arguments
+     * @param user user who sent the request
+     * @return reply message
+     * @throws IllegalArgumentException if the message is incomplete or invalid
+     */
     private MessageBuffer edit(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=2) throw new IllegalArgumentException();
         String docName=new String(Args.get(0));
@@ -82,6 +127,13 @@ public class ServerExecutor implements Runnable {
         }
     }
 
+    /**
+     * Method to execute an end edit request in the service
+     * @param Args Message arguments
+     * @param user user who sent the request
+     * @return reply message
+     * @throws IllegalArgumentException if the message is incomplete or invalid
+     */
     private MessageBuffer end_edit(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=3) throw new IllegalArgumentException();
         String docName=new String(Args.get(0));
@@ -91,6 +143,10 @@ public class ServerExecutor implements Runnable {
         return MessageBuffer.createMessageBuffer(result);
     }
 
+    /**
+     * Method to successfully log out an user
+     * If a user is editing the section of a document, this section becomes available again
+     */
     private void logout(){
         String user=connectedUsers.remove(socket);
         if(user!=null)  {
@@ -99,6 +155,12 @@ public class ServerExecutor implements Runnable {
         }
     }
 
+    /**
+     * Method to correctly execute a request received form a socket using a MessageBuffer
+     * @param msg MessageBuffer containing the request
+     * @return reply message
+     * @throws IOException if an error occurs during Socket Operation
+     */
     private MessageBuffer execute(MessageBuffer msg)throws IOException{
         Vector<byte[]> Args=msg.getArgs();
         MessageBuffer reply;
@@ -141,6 +203,12 @@ public class ServerExecutor implements Runnable {
         return reply;
     }
 
+    /**
+     * Implementation of the run method from the Runnable Interface
+     * It reads from a socket, execute the request and send a reply
+     * If an error occurs during I/O operations with the socket, the connection is lost
+     * And the user is logged of from the service
+     */
     public void run() {
         try {
             MessageBuffer request=MessageBuffer.readMessage(socket);
