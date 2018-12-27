@@ -1,6 +1,10 @@
+import Message.Operation;
 import ServerData.ServerData;
 import ServerData.ServerExecutor;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -10,31 +14,35 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.*;
 
 public class TuringServer {
-    //TODO: file config
     //TODO: Commenti
 
-    private static final int numThreads=8;
-    private static final String dirPath="files/";
-    private static final String bakPath="bak/";
-    private static final int portRMI=55431;
-    private static final int portTCP=55432;
-    private static final int timeout=1000;
+    private static int numThreads;
+    private static String dirPath;
+    private static  String bakPath;
+    private static int portRMI;
+    private static int portTCP;
+    private static int timeout;
 
     private static ServerData data;
     private static Selector selector=null;
     private static BlockingQueue<SocketChannel>queue;
     private static ThreadPoolExecutor pool;
+    private static Properties config;
+    private static Properties defaultConfig=new Properties();
 
     public static void main(String[] args){
         ServerSocketChannel dispatcher;
         queue= new LinkedBlockingQueue<>();
-        pool=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
+        setDefault();
+        config=new Properties(defaultConfig);
         try {
+            setProperties();
             data=ServerData.createServerData(dirPath,portRMI);
             dispatcher= openDispatcher();
             selector= Selector.open();
@@ -45,6 +53,7 @@ public class TuringServer {
             e.printStackTrace();
             System.exit(-1);
         }
+        pool=(ThreadPoolExecutor) Executors.newFixedThreadPool(numThreads);
         while(!Thread.interrupted()){
             try{
                 select();
@@ -98,6 +107,38 @@ public class TuringServer {
            if(key.isAcceptable()) acceptableKey(key);
            else if(key.isReadable()) readableKey(key);
            iterator.remove();
+       }
+   }
+
+   private static void setProperties() throws IOException{
+        try{
+            config.load(new FileInputStream("config.ini"));
+        }
+        catch (FileNotFoundException e){
+            defaultConfig.store(new FileOutputStream("config.ini", false),"");
+        }
+       dirPath=config.getProperty("dirPath");
+       bakPath=config.getProperty("bakPath");
+       numThreads=getIntegerProperty("numThreads");
+       portTCP=getIntegerProperty("portTCP");
+       portRMI=getIntegerProperty("portRMI");
+       timeout=getIntegerProperty("timeout");
+   }
+
+   private static void setDefault(){
+       defaultConfig.setProperty("dirPath","files/");
+       defaultConfig.setProperty("bakPath","bak/");
+       defaultConfig.setProperty("numThreads","8");
+       defaultConfig.setProperty("portTCP","55432");
+       defaultConfig.setProperty("portRMI","55431");
+       defaultConfig.setProperty("timeout","1000");
+   }
+   private static int getIntegerProperty(String key){
+       try{
+           return Integer.parseInt(config.getProperty(key));
+       }
+       catch (NumberFormatException e){
+           return Integer.parseInt(defaultConfig.getProperty(key));
        }
    }
 
