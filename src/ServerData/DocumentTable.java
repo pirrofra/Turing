@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Francesco Pirrò - Matr. 544539
  */
-public class DocTable implements Serializable {
+/*package*/ class DocumentTable implements Serializable {
 
     private ConcurrentHashMap<String,Document> docMap;
     private String docPath;
@@ -30,7 +30,7 @@ public class DocTable implements Serializable {
      * Class Constructor with no parameter for ConcurrentHashMap
      * @param path path where to store all documents' sections
      */
-    public DocTable(String path){
+    /*package*/ DocumentTable(String path){
         docMap=new ConcurrentHashMap<>();
         docPath=path;
     }
@@ -42,7 +42,7 @@ public class DocTable implements Serializable {
      * @param loadFactor hash map load factor
      * @param concurrencyLevel number of max concurrent access in docMap
      */
-    public DocTable(String path,int initialCapacity, float loadFactor, int concurrencyLevel){
+    /*package*/ DocumentTable(String path, int initialCapacity, float loadFactor, int concurrencyLevel){
         docMap=new ConcurrentHashMap<>(initialCapacity,loadFactor,concurrencyLevel);
         docPath=path;
     }

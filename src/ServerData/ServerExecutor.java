@@ -15,16 +15,16 @@ public class ServerExecutor implements Runnable {
     //TODO:Commenti
 
     private UserTable users;
-    private DocTable documents;
+    private DocumentTable documents;
     private SocketChannel socket;
     private ConcurrentHashMap<SocketChannel,String> connectedUsers;
     private BlockingQueue<SocketChannel> selectorKeys;
 
-    public ServerExecutor(UserTable u, DocTable doc, SocketChannel sock,ConcurrentHashMap<SocketChannel,String>map,BlockingQueue<SocketChannel> queue){
-        users=u;
-        documents=doc;
+    public ServerExecutor(ServerData data, SocketChannel sock, BlockingQueue<SocketChannel> queue){
+        users=data.getUserTable();
+        documents=data.getDocumentTable();
+        connectedUsers=data.getConnectedUsers();
         socket=sock;
-        connectedUsers=map;
         selectorKeys=queue;
     }
 

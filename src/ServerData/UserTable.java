@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Francesco Pirrò - Matr. 544539
  */
-public class UserTable extends RemoteServer implements RemoteUserTable, Serializable {
+/*package*/ class UserTable extends RemoteServer implements RemoteUserTable, Serializable {
 
     //TODO:Serializzazione
 
@@ -27,7 +27,7 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
     /**
      * Class Constructor with no parameters
      */
-    public UserTable(){
+    /*package*/ UserTable(){
         userMap=new ConcurrentHashMap<>();
     }
 
@@ -37,7 +37,7 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
      * @param loadFactor userMap loadFactor
      * @param concurrencyLevel userMap max number of concurrent access
      */
-    public UserTable(int initialCapacity, float loadFactor, int concurrencyLevel){
+    /*package*/ UserTable(int initialCapacity, float loadFactor, int concurrencyLevel){
         userMap=new ConcurrentHashMap<>(initialCapacity,loadFactor,concurrencyLevel);
     }
 

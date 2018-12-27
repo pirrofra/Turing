@@ -16,7 +16,7 @@ import java.util.Vector;
  *
  * @author Francesco Pirrò - Matr. 544539
  */
-public class User implements Serializable {
+/*package*/ class User implements Serializable {
 
     private String username;
     private String password;
@@ -42,7 +42,7 @@ public class User implements Serializable {
      * Username getter
      * @return user.username
      */
-    public String getUsername(){
+    /*package*/ String getUsername(){
         return username;
     }
 
