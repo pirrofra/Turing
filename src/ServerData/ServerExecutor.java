@@ -10,6 +10,16 @@ import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This class implements a runnable object capable of executing a request from a socket
+ *
+ * The run method reads a message from a socket, execute the correct request and send the reply on the same socket
+ * If an error occurs while reading/writing on a socket it closes it's connection
+ * When the request is complete, if the connection is still up, the socket is added to a blockingQueue
+ * This blockingQueue can be used to keep track of which socket needs to be registered to a selector again
+ *
+ * @author Francesco Pirrò - Matr. 544539
+ */
 public class ServerExecutor implements Runnable {
 
     private UserTable users;
