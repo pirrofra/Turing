@@ -9,8 +9,6 @@ import java.util.HashMap;
  */
 public enum Operation {
 
-    //TODO: Commenti a Message.Operation
-
     LOGIN(1),
     CREATE(2),
     SHOW(3),
@@ -41,16 +39,26 @@ public enum Operation {
     int value;
     private static HashMap<Integer,Operation> map=new HashMap<>();
 
+    /**
+     * Enum Constructor
+     * @param v Integer Value
+     */
     Operation(int v){
         value=v;
     }
 
+   //Map between integer and enum
     static {
         for(Operation op: Operation.values()){
             map.put(op.value,op);
         }
     }
 
+    /**
+     * Method which return the correct enum given the integer value using a map
+     * @param v integer value
+     * @return correct enum
+     */
     static Operation valueOf(int v){
         return map.get(v);
     }
