@@ -24,6 +24,8 @@ import java.util.Vector;
  * @author Francesco Pirrò - Matr. 544539
  */
 public class Document implements Serializable {
+
+    private static final int maxSize=Integer.MAX_VALUE; //TODO:capire valore adatto
     private String documentName;
     private String creator;
     private int numSection;
@@ -161,7 +163,7 @@ public class Document implements Serializable {
         if(section>numSection||section<1) throw new IllegalArgumentException();
         else if(!userInvited.contains(username)) return Operation.DOCUMENT_NOT_FOUND;
         else if(currentEdited[section-1]==null||currentEdited[section-1].compareTo(username)!=0) return Operation.EDITING_NOT_REQUESTED;
-        else if(file.length>Integer.MAX_VALUE/numSection) return Operation.FILE_TOO_BIG;
+        else if(file.length>maxSize/numSection) return Operation.FILE_TOO_BIG;
         else{
             saveFile(sectionPath[section-1],file);
             currentEdited[section-1]=null;
