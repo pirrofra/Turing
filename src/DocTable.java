@@ -134,7 +134,7 @@ public class DocTable implements Serializable {
     /**
      * Method to receive the entire document in a MessageBuffer
      * @param document document wanted to be shown
-     * @param user user who sended the request
+     * @param user user who sent the request
      * @return MessageBuffer containing the result and the entire document if successful
      *         a generic Fail error is sent if an I/0 error occurs
      * @throws IllegalArgumentException if document and/or user are null
