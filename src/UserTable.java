@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.nio.channels.SocketChannel;
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteServer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Francesco Pirrò - Matr. 544539
  */
 public class UserTable extends RemoteServer implements RemoteUserTable, Serializable {
-
 
     private ConcurrentHashMap<String,User> userMap;
 
@@ -81,10 +81,27 @@ public class UserTable extends RemoteServer implements RemoteUserTable, Serializ
         else return user.addDocument(document);
     }
 
+    /**
+     * Method to get list of Documents
+     * @param username name of the user
+     * @return string which contains all documents
+     * @throws IllegalArgumentException if username is null
+     */
     public String getList(String username) throws IllegalArgumentException{
         if(username==null) throw new IllegalArgumentException();
         User user=userMap.get(username);
         if(user==null) return null;
         else return user.documentList();
+    }
+
+    /**
+     * Method to log off an user
+     * @param username user to log off
+     */
+    public void logoff(String username){
+        if(username!=null){
+            User user=userMap.get(username);
+            if(user!=null) user.logoff();
+        }
     }
 }

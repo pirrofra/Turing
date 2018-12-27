@@ -29,7 +29,9 @@ public enum Operation {
     USER_ALREADY_INVITED(-9),
     PERMISSION_DENIED(-10),
     FILE_TOO_BIG(-11),
-    REQUEST_INCOMPLETE(-12);
+    REQUEST_INCOMPLETE(-12),
+    CLIENT_NOT_LOGGED_IN(-13),
+    INVALID_REQUEST(-14);
     // --- RESPONSE --- //
 
     int value;

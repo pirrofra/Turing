@@ -151,15 +151,16 @@ public class MessageBuffer {
      * @return Vector of byte array
      */
     public Vector<byte[]> getArgs(){
-        if(body==null) return null;
         Vector<byte[]> argsVector=new Vector<>();
-        while(body.hasRemaining()){
-            int dimension=body.getInt();
-            byte[] arg=new byte[dimension];
-            body.get(arg);
-            argsVector.add(arg);
+        if(body!=null){
+            while(body.hasRemaining()){
+                int dimension=body.getInt();
+                byte[] arg=new byte[dimension];
+                body.get(arg);
+                argsVector.add(arg);
+            }
+            body.flip();
         }
-        body.flip();
         return argsVector;
     }
 
