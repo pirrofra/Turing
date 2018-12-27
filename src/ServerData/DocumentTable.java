@@ -55,7 +55,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * @return Message.Operation.FAIL if an I/0 Error occurs
      *         Message.Operation.Name_not_available if the name is not available
      *         Message.Operation.OK if successful
-     * @throws IllegalArgumentException if name and/or creator are null or numsections is zero or less
+     * @throws IllegalArgumentException if name and/or creator are null or numSections is zero or less
      */
     /*package*/ Operation createDocument(String name, String creator, int numSections) throws IllegalArgumentException{
         Document newDoc;
