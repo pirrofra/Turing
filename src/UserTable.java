@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class UserTable extends RemoteServer implements RemoteUserTable, Serializable {
 
+    //TODO:Serializzazione
+
     private ConcurrentHashMap<String,User> userMap;
 
     /**

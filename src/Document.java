@@ -25,6 +25,7 @@ import java.util.Vector;
  */
 public class Document implements Serializable {
 
+    //TODO:implementare la gestione dell'Indirizzo per il MulticastSocket
     private static final int maxSize=Integer.MAX_VALUE; //TODO:capire valore adatto
     private String documentName;
     private String creator;

@@ -21,7 +21,7 @@ public class DocTable implements Serializable {
     //TODO:Show anche per la singola Sezione
     //TODO:Show deve anche indicare chi sta editando le sezioni
     //TODO:Lista e Show devono dire il numero di sezioni in cui il file è diviso
-
+    //TODO:Serializzazione
     /**
      * Class Constructor with no parameter for ConcurrentHashMap
      * @param path path where to store all documents' sections

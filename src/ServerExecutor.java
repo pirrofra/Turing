@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerExecutor implements Runnable {
 
+    //TODO:Commenti
+
     private UserTable users;
     private DocTable documents;
     private SocketChannel socket;
