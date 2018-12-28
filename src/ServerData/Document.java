@@ -196,6 +196,29 @@ import java.util.Vector;
     }
 
     /**
+     * Method to return all document's info
+     * @return String containing all document's info
+     */
+    /*package*/ synchronized String getInfo(){
+        StringBuilder builder=new StringBuilder();
+        builder.append(documentName);
+        builder.append("\n");
+        builder.append("Creator: ");
+        builder.append(creator);
+        builder.append("\n");
+        builder.append("Invited User: ");
+        for(String user:userInvited){
+            builder.append(user);
+            builder.append(" ");
+        }
+        builder.append("\n");
+        builder.append("Number of Section: ");
+        builder.append(numSection);
+        builder.append("\n");
+        return builder.toString();
+    }
+
+    /**
      * Method to notify the user has stopped editing without saving any content
      * @param user user who stopped editing
      */

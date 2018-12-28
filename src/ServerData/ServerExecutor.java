@@ -97,8 +97,14 @@ public class ServerExecutor implements Runnable {
      */
     private MessageBuffer list(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=0) throw new IllegalArgumentException();
-        String docList=users.getList(user);
-        return MessageBuffer.createMessageBuffer(Operation.OK,docList.getBytes());
+        Vector<String> docList=users.getList(user);
+        StringBuilder builder=new StringBuilder();
+        for(String doc:docList){
+            String info=documents.getInfo(doc);
+            if(info!=null) builder.append(info);
+        }
+        if(builder.length()==0) builder.append("You can't edit any document");
+        return MessageBuffer.createMessageBuffer(Operation.OK,builder.toString().getBytes());
     }
 
     /**

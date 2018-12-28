@@ -6,6 +6,7 @@ import RemoteUserTable.RemoteUserTable;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteServer;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -88,10 +89,10 @@ import java.util.concurrent.ConcurrentHashMap;
     /**
      * Method to get list of Documents
      * @param username name of the user
-     * @return string which contains all documents
+     * @return Vector which contains all documents
      * @throws IllegalArgumentException if username is null
      */
-    /*package*/ String getList(String username) throws IllegalArgumentException{
+    /*package*/ Vector<String> getList(String username) throws IllegalArgumentException{
         if(username==null) throw new IllegalArgumentException();
         User user=userMap.get(username);
         if(user==null) return null;

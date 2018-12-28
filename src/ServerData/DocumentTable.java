@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
     private String docPath;
 
     //TODO:Show deve anche indicare chi sta editando le sezioni
-    //TODO:Lista deve indicare il numero di sezioni e i possibili editor
 
     /**
      * Class Constructor with no parameter for ConcurrentHashMap
@@ -181,6 +180,19 @@ import java.util.concurrent.ConcurrentHashMap;
     }
 
     /**
+     *Method to return all document's info
+     * @param document document whose information are needed
+     * @return String containing all document's info
+     * @throws IllegalArgumentException if document is null
+     */
+    /*package*/String getInfo(String document) throws IllegalArgumentException{
+        if(document==null) throw new IllegalArgumentException();
+        Document doc=docMap.get(document);
+        if(doc==null) return null;
+        else return doc.getInfo();
+    }
+
+    /**
      * Method to notify the user has stopped editing without saving any content
      * @param document document stopped to be edited
      * @param username username who stopped editing
@@ -193,5 +205,6 @@ import java.util.concurrent.ConcurrentHashMap;
             }
         }
     }
+
 
 }

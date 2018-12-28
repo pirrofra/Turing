@@ -80,15 +80,10 @@ import java.util.Vector;
 
     /**
      * Method to get the list of this user's document
-     * @return a string containing all user's document
+     * @return a vector containing all user's document
      */
-    /*package*/ synchronized String documentList(){
-        StringBuilder list=new StringBuilder();
-            for(String doc: documentList){
-                list.append(doc);
-                list.append("\n");
-            }
-        return list.toString();
+    /*package*/ synchronized Vector<String> documentList(){
+        return new Vector<>(documentList);
     }
 
     /**
