@@ -19,6 +19,22 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.*;
 
+/**
+ * Turing Server implementation
+ *
+ * This server uses Non-Blocking NIO Channels and a selector for TCP communication
+ * When a socket is ready to be read, it's de-registered from the selector and it's given to a
+ * FixedThreadPool where a thread will read his message, execute his request and send a reply
+ * After the request is completed the channel is added in a blocking queue, where all channels who
+ * needs to be registered again in the selector are
+ *
+ * In this way one thread, and one thread only, can have access to the channel and no interference between read and write can happen
+ *
+ * This server reads a serverConfig.ini file to get its properties.
+ * If no serverConfig.ini file is found or it's incomplete, default properties will be chosen
+ *
+ * @author Francesco Pirrò - Matr.544539
+ */
 public class TuringServer {
     //TODO: Commenti
 
@@ -36,6 +52,10 @@ public class TuringServer {
     private static Properties config;
     private static Properties defaultConfig=new Properties();
 
+    /**
+     * Server Main
+     * @param args No arguments needed in this main
+     */
     public static void main(String[] args){
         ServerSocketChannel dispatcher;
         queue= new LinkedBlockingQueue<>();
@@ -65,6 +85,10 @@ public class TuringServer {
 
    }
 
+    /**
+     * Static Method that retrieves all channel in queue and register them to the selector again
+     * @throws IOException if an error occurs during the registering process
+     */
    private static void retrieveSocketChannels() throws IOException{
         Vector<SocketChannel> list=new Vector<>();
         queue.drainTo(list);
@@ -73,14 +97,24 @@ public class TuringServer {
         }
    }
 
+    /**
+     * Static Method that open the ServerSocketChannel which can accept new connections
+     * @return new ServerSocketChannel
+     * @throws IOException if an error occurs during the opening process
+     */
    private static ServerSocketChannel openDispatcher()throws IOException {
-       SocketAddress serverAddres=new InetSocketAddress(portTCP);
+       SocketAddress serverAddress=new InetSocketAddress(portTCP);
        ServerSocketChannel dispatcher=ServerSocketChannel.open();
-       dispatcher.bind(serverAddres);
+       dispatcher.bind(serverAddress);
        dispatcher.configureBlocking(false);
        return dispatcher;
    }
 
+    /**
+     * Static Method that deals with an acceptable Key given by the selected Keys from the selector
+     * @param dispatcher key which result acceptable
+     * @throws IOException if an error occurs during the acceptance process
+     */
    private static void acceptableKey(SelectionKey dispatcher)throws IOException{
         ServerSocketChannel socket=(ServerSocketChannel)dispatcher.channel();
         SocketChannel newSocket=socket.accept();
@@ -89,6 +123,11 @@ public class TuringServer {
         System.out.println("New Connection started with "+newSocket.getRemoteAddress().toString());
    }
 
+    /**
+     * Static Method that deals with a readable key given by the selected Keys from the selector
+     * @param key key which result readable
+     * @throws IOException if an error occurs
+     */
    private static void readableKey(SelectionKey key)throws IOException{
         SocketChannel client=(SocketChannel) key.channel();
         key.cancel();
@@ -97,6 +136,10 @@ public class TuringServer {
         pool.execute(thread);
    }
 
+    /**
+     * Static method which select ready keys and deals with them
+     * @throws IOException if an i/o error occurs
+     */
    private static void select() throws IOException{
        retrieveSocketChannels();
        selector.select(timeout);
@@ -110,6 +153,10 @@ public class TuringServer {
        }
    }
 
+    /**
+     * Static Method which read from serverConfig.ini and set global variables with the correct values
+     * @throws IOException if an error occurs while reading the files
+     */
    private static void setProperties() throws IOException{
         try{
             FileInputStream input=new FileInputStream("serverConfig.ini");
@@ -129,6 +176,9 @@ public class TuringServer {
        timeout=getIntegerProperty("timeout");
    }
 
+    /**
+     * Static Method which initialize defaultConfig with some default configuration for the server
+     */
    private static void setDefault(){
        defaultConfig.setProperty("dirPath","files/");
        defaultConfig.setProperty("bakPath","bak/");
@@ -138,6 +188,11 @@ public class TuringServer {
        defaultConfig.setProperty("timeout","1000");
    }
 
+    /**
+     * Method which return the integer corresponding to the value in serverConfig, or a default value if the value is not an integer
+     * @param key Property name which should have an integer value
+     * @return integer value
+     */
    private static int getIntegerProperty(String key){
        try{
            return Integer.parseInt(config.getProperty(key));
