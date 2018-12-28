@@ -23,9 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Francesco Pirrò - Matr.544539
  */
 public class ServerData implements Serializable {
-    private UserTable users;
-    private DocumentTable documents;
-    private ConcurrentHashMap<SocketChannel,String> connectedUsers;
+    private final UserTable users;
+    private final DocumentTable documents;
+    private final ConcurrentHashMap<SocketChannel,String> connectedUsers;
 
     /**
      * Private class constructor

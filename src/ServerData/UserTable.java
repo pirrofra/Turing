@@ -4,7 +4,6 @@ import Message.Operation;
 import RemoteUserTable.RemoteUserTable;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.rmi.server.RemoteServer;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
