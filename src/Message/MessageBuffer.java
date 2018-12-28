@@ -66,17 +66,6 @@ public class MessageBuffer {
     }
 
     /**
-     * Static Method to generate Message.MessageBuffer
-     * @param operation message type
-     * @param file ByteBuffer used for the message body
-     * @return a Message.MessageBuffer ready to be sent if operation is Message.Operation.OK or Message.Operation.End_Edit, null otherwise
-     */
-    public static MessageBuffer createMessageBuffer(Operation operation, ByteBuffer file){
-        if(operation!=Operation.OK && operation!=Operation.END_EDIT) return null;
-        else return new MessageBuffer(operation,file);
-    }
-
-    /**
      * Static Method to read a Message from a socketChannel
      * @param socket SocketChannel from where the message has to be read
      * @return Message read

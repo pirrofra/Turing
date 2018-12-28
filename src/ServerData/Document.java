@@ -107,7 +107,7 @@ import java.util.Vector;
      * @param username user who requested the edit
      * @throws IllegalArgumentException if section is 0 or more than numSection and/or if username is null
      * @throws IOException if an error occurs during I/O operations
-     * @return Message.MessageBuffer containing result and filebuffer
+     * @return Message.MessageBuffer containing result and file buffer
      */
     /*package*/ synchronized MessageBuffer edit(int section,String username) throws IllegalArgumentException,IOException{
         if(section>numSection||section<1||username==null) throw new IllegalArgumentException();
@@ -115,14 +115,14 @@ import java.util.Vector;
         else if(currentEdited[section-1]==null){
             currentEdited[section-1]=username;
             ByteBuffer file=openFile(sectionPath[section-1]);
-            return MessageBuffer.createMessageBuffer(Operation.OK,file);
+            return MessageBuffer.createMessageBuffer(Operation.OK,file.array());
         }
         else return MessageBuffer.createMessageBuffer(Operation.SECTION_BUSY);
     }
 
     /**
      * Method to receive in a messageBuffer the entire document
-     * @param username user who sended the request
+     * @param username user who sent the request
      * @return messageBuffer containing the entire document
      * @throws IllegalArgumentException if username is null
      * @throws IOException if an error occurs during I/O operations
@@ -134,13 +134,21 @@ import java.util.Vector;
         for(Path path:sectionPath){
             dimension+=Files.size(path);
         }
+        StringBuilder info=new StringBuilder();
+        info.append("Section currently edited: ");
+        for(int i=0;i<numSection;i++){
+            if(currentEdited[i]!=null) {
+                info.append(i);
+                info.append("\n");
+            }
+        }
         ByteBuffer completeDocument=ByteBuffer.allocate(dimension);
         for(Path path:sectionPath){
             ByteBuffer section=openFile(path);
             completeDocument.put(section);
         }
         completeDocument.flip();
-        return MessageBuffer.createMessageBuffer(Operation.OK,completeDocument);
+        return MessageBuffer.createMessageBuffer(Operation.OK,completeDocument.array(),info.toString().getBytes());
     }
 
     /**
@@ -154,7 +162,10 @@ import java.util.Vector;
         if(section>numSection||section<1||username==null) throw new IllegalArgumentException();
         else if(!userInvited.contains(username)) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
         ByteBuffer file=openFile(sectionPath[section-1]);
-        return MessageBuffer.createMessageBuffer(Operation.OK,file);
+        String info;
+        if(currentEdited[section-1]==null) info="Nobody is editing this section";
+        else info=currentEdited[section-1]+" is editing this section";
+        return MessageBuffer.createMessageBuffer(Operation.OK,file.array(),info.getBytes());
     }
 
     /**

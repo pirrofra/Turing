@@ -23,8 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
     private ConcurrentHashMap<String,Document> docMap;
     private String docPath;
 
-    //TODO:Show deve anche indicare chi sta editando le sezioni
-
     /**
      * Class Constructor with no parameter for ConcurrentHashMap
      * @param path path where to store all documents' sections
