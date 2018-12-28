@@ -66,15 +66,12 @@ import java.util.Vector;
     /**
      * add a new document to list of available documents
      * @param Document identifier of the document
-     * @return Message.Operation.User_Already_invited if document is already in documentList, Message.Operation.OK if successful
      * @throws IllegalArgumentException if document is null
      */
-    /*package*/ synchronized Operation addDocument (String Document) throws IllegalArgumentException{
+    /*package*/ synchronized  void addDocument (String Document) throws IllegalArgumentException{
         if(Document==null) throw new IllegalArgumentException();
-        if(documentList.contains(Document)) return Operation.USER_ALREADY_INVITED;
-        else{
+        if(!documentList.contains(Document)){
             documentList.add(Document);
-            return Operation.OK;
         }
     }
 

@@ -1,4 +1,3 @@
-import Message.Operation;
 import ServerData.ServerData;
 import ServerData.ServerExecutor;
 
@@ -49,7 +48,7 @@ public class TuringServer {
     private static BlockingQueue<SocketChannel>queue;
     private static ThreadPoolExecutor pool;
     private static Properties config;
-    private static Properties defaultConfig=new Properties();
+    private static final Properties defaultConfig=new Properties();
 
     /**
      * Server Main

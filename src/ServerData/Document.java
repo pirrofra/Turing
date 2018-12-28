@@ -157,6 +157,7 @@ import java.util.Vector;
      * @param section section to be shown
      * @return messageBuffer containing the section if successful
      * @throws IllegalArgumentException if section is not a valid section number or username is null
+     * @throws IOException if an error occurs while reading the file
      */
     /*package*/ synchronized MessageBuffer show(String username,int section) throws IllegalArgumentException,IOException{
         if(section>numSection||section<1||username==null) throw new IllegalArgumentException();
@@ -173,6 +174,7 @@ import java.util.Vector;
      * the section is updated with new file
      * @param section section wanted to be edited
      * @param username user who requested the end edit
+     * @param file  content of the file to be saved
      * @return Message.Operation.Document_Not_Found if the user has not been invited
      *         Message.Operation.Editing_Not_Requested if the user has not requested an editing of this section
      *         Message.Operation.OK if successful

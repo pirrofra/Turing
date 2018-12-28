@@ -22,11 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ServerExecutor implements Runnable {
 
-    private UserTable users;
-    private DocumentTable documents;
-    private SocketChannel socket;
-    private ConcurrentHashMap<SocketChannel,String> connectedUsers;
-    private BlockingQueue<SocketChannel> selectorKeys;
+    private final UserTable users;
+    private final DocumentTable documents;
+    private final SocketChannel socket;
+    private final ConcurrentHashMap<SocketChannel,String> connectedUsers;
+    private final BlockingQueue<SocketChannel> selectorKeys;
 
     /**
      * Public class constructor

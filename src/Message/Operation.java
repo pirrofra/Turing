@@ -37,7 +37,7 @@ public enum Operation {
     // --- RESPONSE --- //
 
     int value;
-    private static HashMap<Integer,Operation> map=new HashMap<>();
+    private static final HashMap<Integer,Operation> map=new HashMap<>();
 
     /**
      * Enum Constructor

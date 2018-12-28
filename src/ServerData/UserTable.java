@@ -21,12 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 /*package*/ class UserTable extends RemoteServer implements RemoteUserTable, Serializable {
 
-    private ConcurrentHashMap<String,User> userMap;
+    private final ConcurrentHashMap<String,User> userMap;
 
     /**
      * Class Constructor with no parameters
      */
-    /*package*/ UserTable() throws RemoteException{
+    /*package*/ UserTable() {
         userMap=new ConcurrentHashMap<>();
     }
 
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * @param loadFactor userMap loadFactor
      * @param concurrencyLevel userMap max number of concurrent access
      */
-    /*package*/ UserTable(int initialCapacity, float loadFactor, int concurrencyLevel)throws RemoteException{
+    /*package*/ UserTable(int initialCapacity, float loadFactor, int concurrencyLevel) {
         userMap=new ConcurrentHashMap<>(initialCapacity,loadFactor,concurrencyLevel);
     }
 
@@ -44,11 +44,10 @@ import java.util.concurrent.ConcurrentHashMap;
      * Method for registering a new user
      * @param username new username
      * @param password new password
-     * @return Message.Operation.Ok if successful, Message.Operation.Username_Not_availabe if the username is already taken
-     * @throws RemoteException Exception thrown by rmi support
+     * @return Message.Operation.Ok if successful, Message.Operation.Username_Not_Available if the username is already taken
      * @throws IllegalArgumentException  if username and/or password are null
      */
-    public Operation registerUser(String username, String password) throws RemoteException, IllegalArgumentException {
+    public Operation registerUser(String username, String password) throws IllegalArgumentException {
         User newUser=new User(username,password);
         if(userMap.putIfAbsent(username,newUser)==null) return Operation.OK;
         else return Operation.NAME_NOT_AVAILABLE;
@@ -75,15 +74,14 @@ import java.util.concurrent.ConcurrentHashMap;
      * add a ServerData.Document to an user
      * @param username user
      * @param document document to add
-     * @return Message.Operation.User_not_found if username is not an existing user,
-     *          Message.Operation.User_Already_invited if document has already been added, Message.Operation.OK if successful
      * @throws IllegalArgumentException if username and/or document are null
      */
-    /*package*/ Operation addDocument(String username,String document) throws IllegalArgumentException{
+    /*package*/ void addDocument(String username, String document) throws IllegalArgumentException{
         if(username==null) throw new IllegalArgumentException();
         User user=userMap.get(username);
-        if(user==null) return Operation.USER_NOT_FOUND;
-        else return user.addDocument(document);
+        if(user!=null){
+            user.addDocument(document);
+        }
     }
 
     /**

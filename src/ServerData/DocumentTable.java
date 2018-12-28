@@ -20,8 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 /*package*/ class DocumentTable implements Serializable {
 
-    private ConcurrentHashMap<String,Document> docMap;
-    private String docPath;
+    private final ConcurrentHashMap<String,Document> docMap;
+    private final String docPath;
 
     /**
      * Class Constructor with no parameter for ConcurrentHashMap

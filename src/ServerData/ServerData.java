@@ -30,9 +30,8 @@ public class ServerData implements Serializable {
     /**
      * Private class constructor
      * @param path Path to use for storing documents
-     * @throws RemoteException if an error occurs during a Remote Method Invocation
      */
-    private ServerData(String path) throws RemoteException{
+    private ServerData(String path) {
         users=new UserTable();
         documents=new DocumentTable(path);
         connectedUsers=new ConcurrentHashMap<>();
@@ -44,9 +43,8 @@ public class ServerData implements Serializable {
      * @param initialCapacity hashTable initial capacity
      * @param loadFactor Hash Table load factor
      * @param concurrencyLevel max number of concurrent access
-     * @throws RemoteException an exception thrown by the RMI-support if an error occurs
      */
-    private ServerData(String path, int initialCapacity, float loadFactor, int concurrencyLevel) throws RemoteException {
+    private ServerData(String path, int initialCapacity, float loadFactor, int concurrencyLevel) {
         users=new UserTable(initialCapacity,loadFactor,concurrencyLevel);
         documents=new DocumentTable(path,initialCapacity,loadFactor,concurrencyLevel);
         connectedUsers=new ConcurrentHashMap<>();

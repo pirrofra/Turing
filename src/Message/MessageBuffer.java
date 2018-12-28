@@ -21,9 +21,9 @@ import java.util.Vector;
  */
 public class MessageBuffer {
 
-    private Operation OP;
-    private int dimension;
-    private ByteBuffer body;
+    private final Operation OP;
+    private final int dimension;
+    private final ByteBuffer body;
 
     /**
      * Private class constructor
@@ -100,7 +100,7 @@ public class MessageBuffer {
     }
 
     /**
-     * Static Method used to read data from a socketchanell
+     * Static Method used to read data from a socketChannel
      * @param socket SocketChannel to read from
      * @param buff ByteBuffer to use to store new data
      * @param size number of byte to read from the socket
