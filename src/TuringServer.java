@@ -36,7 +36,6 @@ import java.util.concurrent.*;
  * @author Francesco Pirrò - Matr.544539
  */
 public class TuringServer {
-    //TODO: Commenti
 
     private static int numThreads;
     private static String dirPath;
