@@ -46,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
     /**
      * Method to create a new document
+     * the new document id is "creator/name"
      * @param name new document name
      * @param creator user who is creating new document
      * @param numSections number of sections this document has
@@ -62,7 +63,7 @@ import java.util.concurrent.ConcurrentHashMap;
         catch (IOException e){
             return Operation.FAIL;
         }
-        if(docMap.putIfAbsent(name,newDoc)==null) return Operation.OK;
+        if(docMap.putIfAbsent(creator+"/"+name,newDoc)==null) return Operation.OK;
         else return Operation.NAME_NOT_AVAILABLE;
     }
 

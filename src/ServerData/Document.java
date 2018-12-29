@@ -62,7 +62,7 @@ import java.util.Vector;
      * @throws IOException if an error occurs during CreateFile
      */
     private void initialize(String path) throws IOException {
-        Path dir=Paths.get(path,documentName);
+        Path dir=Paths.get(path,creator,documentName);
         Files.createDirectories(dir);
         for(int i=1;i<=numSection;i++){
             sectionPath[i-1]=dir.resolve("."+i);

@@ -69,7 +69,7 @@ public class MessageBuffer {
      * Static Method to read a Message from a socketChannel
      * @param socket SocketChannel from where the message has to be read
      * @return Message read
-     * @throws IOException if an error occurs during i/o operations
+     * @throws IOException if an description occurs during i/o operations
      */
     public static MessageBuffer readMessage(SocketChannel socket) throws IOException{
         ByteBuffer header=ByteBuffer.allocate(8);
@@ -87,7 +87,7 @@ public class MessageBuffer {
     /**
      * Method to send this message to a socket
      * @param socket SocketChannel to use to send this message
-     * @throws IOException if an error occurs during i/o operations
+     * @throws IOException if an description occurs during i/o operations
      */
     public void sendMessage(SocketChannel socket) throws IOException{
         ByteBuffer header=ByteBuffer.allocate(8);
@@ -96,7 +96,6 @@ public class MessageBuffer {
         header.flip();
         write(socket,header,8);
         write(socket,body,dimension);
-        body.flip();
     }
 
     /**
@@ -104,7 +103,7 @@ public class MessageBuffer {
      * @param socket SocketChannel to read from
      * @param buff ByteBuffer to use to store new data
      * @param size number of byte to read from the socket
-     * @throws IOException if an error occurs during i/o operations
+     * @throws IOException if an description occurs during i/o operations
      */
     private static void read(SocketChannel socket, ByteBuffer buff,int size) throws IOException {
         while(size>0){
@@ -119,7 +118,7 @@ public class MessageBuffer {
      * @param socket socketChannel to write to
      * @param buff ByteBuffer containing data to write
      * @param size number of byte to write to the socket
-     * @throws IOException if an error occurs during i/o operations
+     * @throws IOException if an description occurs during i/o operations
      */
     private static void write(SocketChannel socket, ByteBuffer buff, int size) throws IOException{
         while(size>0){
