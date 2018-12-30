@@ -13,11 +13,13 @@ import java.awt.event.WindowEvent;
 
     private JFrame father;
     private boolean closeAppAtExit;
+    private boolean closeFormAtExit;
 
-    /*package*/ ResultDialog(JFrame f, String message,boolean close){
+    /*package*/ ResultDialog(JFrame f, String message,boolean closeApp,boolean closeForm){
         super(f,"Attention");
         father=f;
-        closeAppAtExit=close;
+        closeAppAtExit=closeApp;
+        closeFormAtExit=closeForm;
         JButton ok=new JButton("OK");
         ok.addActionListener(this);
         JPanel panel=new JPanel(new BorderLayout());
@@ -28,14 +30,15 @@ import java.awt.event.WindowEvent;
         panel.add(ok,BorderLayout.SOUTH);
     }
 
-    /*package*/ ResultDialog(JFrame f, Operation OP,boolean close){
-        this(f,getDescription(OP),close);
+    /*package*/ ResultDialog(JFrame f, Operation OP,boolean closeApp,boolean closeForm){
+        this(f,getDescription(OP),closeApp,closeForm);
     }
 
     /*package*/ void show(int width,int height){
-        setSize(width,height);
+        setPreferredSize(new Dimension(width,height));
+        pack();
         setLocationRelativeTo(father);
-        show();
+        setVisible(true);
     }
 
     private static String getDescription(Operation OP){
@@ -99,5 +102,6 @@ import java.awt.event.WindowEvent;
     public void actionPerformed(ActionEvent e) {
         dispose();
         if(closeAppAtExit) father.dispatchEvent(new WindowEvent(father,WindowEvent.WINDOW_CLOSING));
+        else if(closeFormAtExit) father.dispose();
     }
 }

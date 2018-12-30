@@ -71,17 +71,23 @@ public class LogForm {
         login.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                form.disable();
+                form.setEnabled(false);
                 String pass=new String(password.getPassword());
                 ResultDialog dialog;
                 try{
                     MessageBuffer result=executor.login(username.getText(),pass);
-                    dialog=new ResultDialog(form,result.getOP(),false);
+                    if(result.getOP()==Operation.OK){
+                        dialog=new ResultDialog(form,result.getOP(),false,true);
+                        MainForm main=new MainForm(executor);
+                        main.initialize();
+                        main.show();
+                    }
+                    else dialog=new ResultDialog(form,result.getOP(),false,false);
                 }
                 catch (IOException exception){
-                    dialog=new ResultDialog(form,"Connection lost with Server",true);
+                    dialog=new ResultDialog(form,"Connection lost with Server",true,false);
                 }
-                form.enable();
+                form.setEnabled(true);
                 dialog.show(400,100);
             }
         });
@@ -89,17 +95,17 @@ public class LogForm {
         register.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                form.disable();
+                form.setEnabled(false);
                 String pass=new String(password.getPassword());
                 ResultDialog dialog;
                 try{
                     Operation result=executor.register(username.getText(),pass);
-                    dialog=new ResultDialog(form,result,false);
+                    dialog=new ResultDialog(form,result,false,false);
                 }
                 catch (IOException exception){
-                    dialog=new ResultDialog(form,"Connection lost with Server",true);
+                    dialog=new ResultDialog(form,"Connection lost with Server",true,false);
                 }
-                form.enable();
+                form.setEnabled(true);
                 dialog.show(400,100);
             }
         });
@@ -122,7 +128,7 @@ public class LogForm {
 
     public void show(){
         //TODO: vedere se form.show va bene lo stesso
-        form.show();
+        form.setVisible(true);
     }
     public static void main(String[] args) throws IOException{
         SocketChannel channel=SocketChannel.open();

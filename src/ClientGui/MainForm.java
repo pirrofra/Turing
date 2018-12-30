@@ -89,7 +89,7 @@ public class MainForm {
 
     public void show(){
         form.pack();
-        form.show();
+        form.setVisible(true);
     }
 
     public void addLog(String log){
