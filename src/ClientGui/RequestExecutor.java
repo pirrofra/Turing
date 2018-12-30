@@ -15,11 +15,13 @@ import java.rmi.registry.Registry;
     private SocketChannel channel;
     private String server;
     private int RMIport;
+    private String filePath;
 
-    /*package*/ RequestExecutor(SocketChannel socket,String hostname,int p){
+    /*package*/ RequestExecutor(SocketChannel socket,String hostname,int p,String path){
         channel=socket;
         server=hostname;
         RMIport=p;
+        filePath=path;
     }
 
     /*package*/ MessageBuffer login(String username,String password) throws IOException{
@@ -39,8 +41,12 @@ import java.rmi.registry.Registry;
         }
     }
 
-    /*package**/ String getRemoteAddress() throws IOException,NullPointerException {
+    /*package*/ String getRemoteAddress() throws IOException,NullPointerException {
         return channel.getRemoteAddress().toString();
+    }
+
+    /*package*/ String getFilePath(){
+        return filePath;
     }
 
 }

@@ -66,7 +66,7 @@ public class LogForm {
         buttonPanel.add(login);
     }
 
-    //TODO:THIS
+    //TODO:Passaggio a EditorForm se LOGIN CORRETTO
     private void addButtonListener(){
         login.addActionListener(new ActionListener() {
             @Override
@@ -121,15 +121,15 @@ public class LogForm {
     }
 
     public void show(){
-        form.setVisible(true);
+        //TODO: vedere se form.show va bene lo stesso
+        form.show();
     }
-
-    public static void main(String[]args) throws IOException{
+    public static void main(String[] args) throws IOException{
         SocketChannel channel=SocketChannel.open();
         InetAddress addr= InetAddress.getByName("localhost");
         SocketAddress addr2=new InetSocketAddress(addr,55432);
         channel.connect(addr2);
-        RequestExecutor exec=new RequestExecutor(channel,"localhost",55431);
+        RequestExecutor exec=new RequestExecutor(channel,"localhost",55431,"files/");
         LogForm log=new LogForm(exec);
         log.initialize();
         log.show();

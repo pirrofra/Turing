@@ -2,7 +2,7 @@ package ClientGui;
 
 import javax.swing.*;
 
-public class EditForm {
+public class EditorForm {
 
     private JFrame form;
 }
