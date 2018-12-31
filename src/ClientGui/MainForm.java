@@ -67,10 +67,30 @@ public class MainForm {
             }
         });
         logout=new JButton("Log out");
+        MainForm mainForm=this;
         logout.addActionListener(new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                disable();
+                ResultDialog dialog;
+                try{
+                    MessageBuffer result=executor.logout();
+                    if(result.getOP()==Operation.OK){
+                        LogForm logForm=new LogForm(mainForm);
+                        logForm.initialize();
+                        logFromServer.setText("");
+                        list.setText("");
+                        logForm.show();
+                        dialog=null;
+                    }
+                    else dialog=new ResultDialog(form,result.getOP(),true,false);
+                }
+                catch (IOException exception){
+                    dialog=new ResultDialog(form,"Connection lost with Server",true,false);
+                }
+                if(dialog!=null)dialog.show();
+                enable();
             }
         });
         try{

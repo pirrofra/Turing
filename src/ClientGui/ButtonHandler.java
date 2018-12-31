@@ -115,7 +115,11 @@ public class ButtonHandler implements ActionListener {
         }
         else log=Operation.getDescription(result.getOP());
         main.addLog(log);
-        return new ResultDialog(mainFrame,result.getOP(),false,false);
+        if(result.getOP()==Operation.OK)
+            return null;
+        else
+            return new ResultDialog(mainFrame,result.getOP(),false,false);
+
     }
 
     private void deleteText(){
@@ -150,8 +154,9 @@ public class ButtonHandler implements ActionListener {
             dialog=new ResultDialog( mainFrame,"Connection lost with Server",true,false);
         }
         main.enable();
-        dialog.show(400,100);
+        if(dialog!=null) dialog.show(400,100);
     }
+
 
     private String saveFile(String docName,String filename,byte[] content) throws IOException{
         Path dir;

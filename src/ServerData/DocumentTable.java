@@ -56,13 +56,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * @throws IllegalArgumentException if name and/or creator are null or numSections is zero or less
      */
     /*package*/ Operation createDocument(String name, String creator, int numSections) throws IllegalArgumentException{
-        Document newDoc;
-        try{
-            newDoc=Document.createDocument(name,creator,numSections);
-        }
-        catch (IOException e){
-            return Operation.FAIL;
-        }
+        Document newDoc=Document.createDocument(name,creator,numSections);
         if(docMap.putIfAbsent(creator+"/"+name,newDoc)==null) {
             try{
                 newDoc.initialize(docPath);

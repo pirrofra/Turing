@@ -42,7 +42,7 @@ import java.awt.event.*;
 
     public void actionPerformed(ActionEvent e) {
         dispose();
-        if(closeAppAtExit) father.dispatchEvent(new WindowEvent(father,WindowEvent.WINDOW_CLOSING));
+        if(closeAppAtExit) System.exit(0);
         else if(closeFormAtExit) father.dispose();
     }
 

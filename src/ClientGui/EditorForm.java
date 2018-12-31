@@ -42,9 +42,12 @@ public class EditorForm {
         isEditing=true;
         form.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
-                super.windowClosed(e);
-                if(isEditing)System.exit(0);
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                if(isEditing){
+                    ResultDialog dialog=new ResultDialog(mainFrame.getMainFrame(),"Editing interrupted. Closing APP",true,false);
+                    dialog.show(400,100);
+                }
             }
         });
     }
