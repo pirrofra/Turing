@@ -1,5 +1,6 @@
 package ServerData;
 
+import ChatRoom.ChatOrganizer;
 import RemoteUserTable.RemoteUserTable;
 
 import java.io.Serializable;
@@ -25,16 +26,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServerData implements Serializable {
     private final UserTable users;
     private final DocumentTable documents;
+    private final ChatOrganizer chat;
     private final ConcurrentHashMap<SocketChannel,String> connectedUsers;
 
     /**
      * Private class constructor
      * @param path Path to use for storing documents
      */
-    private ServerData(String path) {
+    private ServerData(String path,String baseAddress,int bound) {
         users=new UserTable();
         documents=new DocumentTable(path);
         connectedUsers=new ConcurrentHashMap<>();
+        chat=new ChatOrganizer(baseAddress,bound);
     }
 
     /**
@@ -44,10 +47,11 @@ public class ServerData implements Serializable {
      * @param loadFactor Hash Table load factor
      * @param concurrencyLevel max number of concurrent access
      */
-    private ServerData(String path, int initialCapacity, float loadFactor, int concurrencyLevel) {
+    private ServerData(String path,String baseAddress,int bound, int initialCapacity, float loadFactor, int concurrencyLevel) {
         users=new UserTable(initialCapacity,loadFactor,concurrencyLevel);
         documents=new DocumentTable(path,initialCapacity,loadFactor,concurrencyLevel);
         connectedUsers=new ConcurrentHashMap<>();
+        chat=new ChatOrganizer(baseAddress,bound);
     }
 
     /**
@@ -74,6 +78,10 @@ public class ServerData implements Serializable {
         return connectedUsers;
     }
 
+    /*package*/ ChatOrganizer getChatOrganizer(){
+        return chat;
+    }
+
     /**
      * private method to activate the RMI support
      * @param port port to use for the RMI registry
@@ -93,10 +101,10 @@ public class ServerData implements Serializable {
      * @return new ServerData instance
      * @throws RemoteException an exception thrown by the RMI-support if an error occurs
      */
-    public static ServerData createServerData(String path,int RMIport) throws RemoteException{
-        ServerData newdata=new ServerData(path);
-        newdata.activateRMI(RMIport);
-        return newdata;
+    public static ServerData createServerData(String path,String baseAddress,int bound,int RMIport) throws RemoteException{
+        ServerData newData=new ServerData(path,baseAddress,bound);
+        newData.activateRMI(RMIport);
+        return newData;
     }
 
 }

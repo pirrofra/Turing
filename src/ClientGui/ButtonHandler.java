@@ -111,6 +111,7 @@ public class ButtonHandler implements ActionListener {
             String path=saveFile(arg1.getText(),"."+section,args.get(0));
             log="User started editing "+arg1.getText()+", section "+section;
             EditorForm editorForm=new EditorForm(main,arg1.getText(),section,Paths.get(path),null,0);
+            editorForm.initialize(main.getPort());
             editorForm.show();
         }
         else log=Operation.getDescription(result.getOP());

@@ -1,5 +1,6 @@
 package ServerData;
 
+import ChatRoom.ChatOrganizer;
 import Message.MessageBuffer;
 import Message.Operation;
 
@@ -31,8 +32,7 @@ import java.util.Vector;
  */
 /*package*/ class Document implements Serializable {
 
-    //TODO:FIles.write invece di canali
-    //TODO:implementare la gestione dell'Indirizzo per il MulticastSocket
+
     private static final int maxSize=Integer.MAX_VALUE; //TODO:capire valore adatto
     private String documentName;
     private String creator;
@@ -40,6 +40,7 @@ import java.util.Vector;
     private Path[] sectionPath;
     private String[] currentEdited;
     private Vector<String> userInvited;
+    private String chatAddress;
 
     /**
      * Private class constructor
@@ -192,7 +193,7 @@ import java.util.Vector;
      * @throws IllegalArgumentException if section is 0 or more than numSection and/or if username is null
      * @throws IOException if an error occurs during I/O operations
      */
-    /*package*/ synchronized Operation endEdit(int section,String username,byte[] file) throws IllegalArgumentException,IOException{
+    /*package*/ synchronized Operation endEdit(int section, String username, byte[] file, ChatOrganizer chat) throws IllegalArgumentException,IOException{
         if(section>numSection||section<1) throw new IllegalArgumentException();
         else if(!userInvited.contains(username)) return Operation.DOCUMENT_NOT_FOUND;
         else if(currentEdited[section-1]==null||currentEdited[section-1].compareTo(username)!=0) return Operation.EDITING_NOT_REQUESTED;
@@ -200,6 +201,7 @@ import java.util.Vector;
         else{
             saveFile(sectionPath[section-1],file);
             currentEdited[section-1]=null;
+            closeRoomIfEmpty(chat);
             return Operation.OK;
         }
     }
@@ -248,14 +250,27 @@ import java.util.Vector;
      * Method to notify the user has stopped editing without saving any content
      * @param user user who stopped editing
      */
-    /*package*/ synchronized void abruptStop(String user){
+    /*package*/ synchronized void abruptStop(String user,ChatOrganizer chat){
         if(user!=null){
             for(int i=0;i<numSection;i++){
                 if(currentEdited[i]!=null && currentEdited[i].compareTo(user)==0) currentEdited[i]=null;
             }
         }
+        closeRoomIfEmpty(chat);
     }
 
+    /*package*/ synchronized MessageBuffer getRoomAddress(String user,ChatOrganizer chat)throws IllegalArgumentException{
+        if(user==null) throw new IllegalArgumentException();
+        boolean permission=false;
+        for(int i=0;i<numSection;i++){
+            if(currentEdited[i]!=null && currentEdited[i].compareTo(user)==0) permission=true;
+        }
+        if(permission){
+            if(chatAddress==null) chatAddress=chat.getNewAddress();
+            return MessageBuffer.createMessageBuffer(Operation.OK,chatAddress.getBytes(),user.getBytes());
+        }
+        else return MessageBuffer.createMessageBuffer(Operation.EDITING_NOT_REQUESTED);
+    }
     /**
      * Static method to save an array byte in a file
      * @param path path of the file where to save
@@ -273,16 +288,28 @@ import java.util.Vector;
      * @throws IOException if an error occurs during I/O operation on the file
      */
     private static ByteBuffer openFile(Path path) throws IOException{
-        FileChannel file=FileChannel.open(path,StandardOpenOption.READ);
-        int size=(int)file.size();
+        FileChannel fileChannel=FileChannel.open(path,StandardOpenOption.READ);
+        int size=(int)fileChannel.size();
         ByteBuffer buffer=ByteBuffer.allocate(size);
         while (size>0){
-            int byteRead=file.read(buffer);
+            int byteRead=fileChannel.read(buffer);
             if(byteRead<0) throw  new IOException();
             size-=byteRead;
         }
         buffer.flip();
         return buffer;
+    }
+
+    private void closeRoomIfEmpty(ChatOrganizer chat){
+        boolean empty=true;
+        for(int i=0;i<numSection;i++){
+            if(currentEdited[i]!=null)
+                empty=false;
+        }
+        if(empty) {
+            chatAddress=null;
+            chat.closeRoom(chatAddress);
+        }
     }
 
 }

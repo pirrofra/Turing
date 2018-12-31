@@ -16,15 +16,19 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Vector;
 
 public class EditorForm {
+
+    //TODO: Se si perde la connessione con il server lancia comunque un errore di Retry
+    //TODO: Jscroll non rimane in basso
 
     private final JDialog form;
     private final MainForm mainFrame;
     private final Path filePath;
     private final RequestExecutor executor;
     private final JTextArea chatBox;
-    private final ChatRoom chat;
+    private  ChatRoom chat;
     private final String docName;
     private final int section;
     private boolean isEditing;
@@ -48,6 +52,7 @@ public class EditorForm {
                     ResultDialog dialog=new ResultDialog(mainFrame.getMainFrame(),"Editing interrupted. Closing APP",true,false);
                     dialog.show(400,100);
                 }
+                chat.interrupt();
             }
         });
     }
@@ -117,7 +122,6 @@ public class EditorForm {
         return scrollableChat;
     }
 
-    //TODO: ADD BUTTON EVENT
     private JPanel sendMessageBox(){
         JPanel messageLine=new JPanel();
         JTextField mex=new JTextField();
@@ -129,23 +133,52 @@ public class EditorForm {
         send.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try{
+                    chat.sendMessage(mex.getText());
+                }
+                catch (IOException exception){
+                    ResultDialog dialog=new ResultDialog(form,"Message couldn't be sent",false,false);
+                    dialog.show(400,100);
+                }
+                mex.setText("");
             }
         });
         return messageLine;
     }
 
-    public void show(){
+    public void initialize(int port){
         fillForm();
-        startChat();
+        startChat(port);
+    }
+
+    public void show(){
         form.setPreferredSize(new Dimension(800,600));
         form.pack();
         form.setLocationRelativeTo(mainFrame.getMainFrame());
         form.setVisible(true);
     }
 
-    private void startChat(){
-
+    private void startChat(int port){
+        MessageBuffer result;
+        try{
+            result=executor.chatRoom(docName);
+            Vector<byte[]> Args=result.getArgs();
+            if(result.getOP()==Operation.OK){
+                String address=new String(Args.get(0));
+                String user=new String(Args.get(1));
+                chat=new ChatRoom(address,port,chatBox,user);
+                chatBox.append("Chat on "+address+" started\n");
+                chat.start();
+            }
+            else {
+                chatBox.append(Operation.getDescription(result.getOP()));
+            }
+        }
+        catch (IOException e){
+            ResultDialog dialog=new ResultDialog(form,"Error while opening chat",false,false);
+            dialog.show(400,100);
+            chatBox.append("--- CHAT CRASHED ---\n");
+        }
     }
 
     private static ByteBuffer openFile(Path path) throws IOException{

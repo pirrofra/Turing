@@ -1,5 +1,6 @@
 package ServerData;
 
+import ChatRoom.ChatOrganizer;
 import Message.MessageBuffer;
 import Message.Operation;
 
@@ -121,13 +122,13 @@ import java.util.concurrent.ConcurrentHashMap;
      *         Message.Operation.OK if successful
      * @throws IllegalArgumentException if document or user are null, section is not an existing section number or file is null
      */
-    /*package*/ Operation endEdit(String document,String user,int section, byte[] file) throws IllegalArgumentException{
+    /*package*/ Operation endEdit(String document,String user,int section, byte[] file,ChatOrganizer chat) throws IllegalArgumentException{
         if(document==null||file==null) throw new IllegalArgumentException();
         Document doc=docMap.get(document);
         if(doc==null) return Operation.DOCUMENT_NOT_FOUND;
         else {
             try{
-                return doc.endEdit(section,user,file);
+                return doc.endEdit(section,user,file,chat);
             }
             catch (IOException e){
                 return Operation.FAIL;
@@ -198,14 +199,20 @@ import java.util.concurrent.ConcurrentHashMap;
      * @param document document stopped to be edited
      * @param username username who stopped editing
      */
-    /*package*/ void abruptStop(String document,String username){
+    /*package*/ void abruptStop(String document, String username, ChatOrganizer chat){
         if(document!=null){
             Document doc=docMap.get(document);
             if(doc!=null){
-                doc.abruptStop(username);
+                doc.abruptStop(username,chat);
             }
         }
     }
 
+    /*package*/ MessageBuffer getChatAddress(String document, String username,ChatOrganizer chat) throws IllegalArgumentException{
+        if(document==null) throw new IllegalArgumentException();
+        Document doc=docMap.get(document);
+        if(doc==null) return MessageBuffer.createMessageBuffer(Operation.DOCUMENT_NOT_FOUND);
+        else return doc.getRoomAddress(username,chat);
+    }
 
 }

@@ -102,6 +102,12 @@ import java.rmi.registry.Registry;
         return  MessageBuffer.readMessage(channel);
     }
 
+    /*package*/ synchronized MessageBuffer chatRoom(String docName) throws IOException{
+        MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.CHAT_ROOM,docName.getBytes());
+        request.sendMessage(channel);
+        return MessageBuffer.readMessage(channel);
+    }
+
     /*package*/ String getRemoteAddress() throws IOException,NullPointerException {
         return channel.getRemoteAddress().toString();
     }

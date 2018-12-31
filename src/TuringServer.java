@@ -37,10 +37,13 @@ import java.util.concurrent.*;
 public class TuringServer {
 
     //TODO: Serializzazione o pulizia di dirPath
+    //TODO: Se si richiede una sezione che qualcuno stava già editando, l'utente risulta come se stesse già editando
 
     private static int numThreads;
     private static String dirPath;
     private static  String bakPath;
+    private static String baseAddress;
+    private static int bound;
     private static int portRMI;
     private static int portTCP;
     private static int timeout;
@@ -63,7 +66,7 @@ public class TuringServer {
         config=new Properties(defaultConfig);
         try {
             setProperties();
-            data=ServerData.createServerData(dirPath,portRMI);
+            data=ServerData.createServerData(dirPath,baseAddress,bound,portRMI);
             dispatcher= openDispatcher();
             selector= Selector.open();
             dispatcher.register(selector, SelectionKey.OP_ACCEPT);
@@ -170,6 +173,8 @@ public class TuringServer {
         }
        dirPath=config.getProperty("dirPath");
        bakPath=config.getProperty("bakPath");
+       baseAddress=config.getProperty("MulticastBaseAddress");
+       bound=getIntegerProperty("MulticastBound");
        numThreads=getIntegerProperty("numThreads");
        portTCP=getIntegerProperty("portTCP");
        portRMI=getIntegerProperty("portRMI");
@@ -182,6 +187,8 @@ public class TuringServer {
    private static void setDefault(){
        defaultConfig.setProperty("dirPath","files/");
        defaultConfig.setProperty("bakPath","bak/");
+       defaultConfig.setProperty("MulticastBaseAddress","239.0.0.0");
+       defaultConfig.setProperty("MulticastBound","10000");
        defaultConfig.setProperty("numThreads","8");
        defaultConfig.setProperty("portTCP","55432");
        defaultConfig.setProperty("portRMI","55431");

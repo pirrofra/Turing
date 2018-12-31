@@ -16,6 +16,7 @@ import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.Vector;
 
 public class MainForm {
@@ -27,14 +28,15 @@ public class MainForm {
     private JButton updateList;
     private JButton logout;
     private JLabel connectionStatus;
+    private final int chatPort;
 
-    public MainForm(RequestExecutor exec){
+    public MainForm(RequestExecutor exec,int port){
         executor=exec;
         form=new JFrame("Turing Client");
+        chatPort=port;
     }
 
 
-    //TODO:LOGOUT EVENT
     private void createUIComponents(){
         logFromServer=new JTextArea();
         logFromServer.setEditable(false);
@@ -183,7 +185,9 @@ public class MainForm {
         SocketAddress addr2=new InetSocketAddress(addr,55432);
         channel.connect(addr2);
         RequestExecutor exec=new RequestExecutor(channel,"localhost",55431,"filesClient/");
-        MainForm log=new MainForm(exec);
+        Scanner in=new Scanner(System.in);
+        int port=in.nextInt();
+        MainForm log=new MainForm(exec,port);
         log.initialize();
         log.show();
     }
@@ -198,5 +202,9 @@ public class MainForm {
 
     public void update(){
         updateList.doClick();
+    }
+
+    public int getPort(){
+        return chatPort;
     }
 }

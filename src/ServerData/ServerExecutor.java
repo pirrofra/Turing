@@ -1,5 +1,6 @@
 package ServerData;
 
+import ChatRoom.ChatOrganizer;
 import Message.MessageBuffer;
 import Message.Operation;
 
@@ -24,6 +25,7 @@ public class ServerExecutor implements Runnable {
 
     private final UserTable users;
     private final DocumentTable documents;
+    private final ChatOrganizer chat;
     private final SocketChannel socket;
     private final ConcurrentHashMap<SocketChannel,String> connectedUsers;
     private final BlockingQueue<SocketChannel> selectorKeys;
@@ -38,6 +40,7 @@ public class ServerExecutor implements Runnable {
         users=data.getUserTable();
         documents=data.getDocumentTable();
         connectedUsers=data.getConnectedUsers();
+        chat=data.getChatOrganizer();
         socket=sock;
         selectorKeys=queue;
     }
@@ -157,9 +160,15 @@ public class ServerExecutor implements Runnable {
         if(Args.size()!=3) throw new IllegalArgumentException();
         String docName=new String(Args.get(0));
         int section=ByteBuffer.wrap(Args.get(1)).getInt();
-        Operation result=documents.endEdit(docName,user,section,Args.get(2));
+        Operation result=documents.endEdit(docName,user,section,Args.get(2),chat);
         users.endEdit(user);
         return MessageBuffer.createMessageBuffer(result);
+    }
+
+    private MessageBuffer charRoom(Vector<byte[]> Args,String user) throws IllegalArgumentException{
+        if(Args.size()!=1) throw new IllegalArgumentException();
+        String docName=new String(Args.get(0));
+        return documents.getChatAddress(docName,user,chat);
     }
 
     /**
@@ -170,7 +179,7 @@ public class ServerExecutor implements Runnable {
         String user=connectedUsers.remove(socket);
         if(user!=null)  {
             String doc=users.logoff(user);
-            if(doc!=null) documents.abruptStop(doc,user);
+            if(doc!=null) documents.abruptStop(doc,user,chat);
         }
     }
 
@@ -205,7 +214,10 @@ public class ServerExecutor implements Runnable {
                 case EDIT:  System.out.println("Edit Document request received from "+user);
                     reply=edit(Args,user);
                     break;
-                case END_EDIT:  System.out.println("End EDit Document request received from "+user);
+                case CHAT_ROOM: System.out.println("Join Chat request received from "+user);
+                    reply=charRoom(Args,user);
+                    break;
+                case END_EDIT:  System.out.println("End Edit request received from "+user);
                     reply=end_edit(Args,user);
                     break;
                 case LOGOUT:  System.out.println("Logout request received from "+user);
