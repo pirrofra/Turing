@@ -19,14 +19,14 @@ import java.nio.file.StandardOpenOption;
 
 public class EditorForm {
 
-    private JDialog form;
-    private MainForm mainFrame;
-    private Path filePath;
-    private RequestExecutor executor;
-    private JTextArea chatBox;
-    private ChatRoom chat;
-    private String docName;
-    private int section;
+    private final JDialog form;
+    private final MainForm mainFrame;
+    private final Path filePath;
+    private final RequestExecutor executor;
+    private final JTextArea chatBox;
+    private final ChatRoom chat;
+    private final String docName;
+    private final int section;
     private boolean isEditing;
 
     public EditorForm(MainForm father,String doc,int numSect,Path file,String group,int port){

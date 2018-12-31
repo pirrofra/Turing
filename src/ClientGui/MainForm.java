@@ -20,8 +20,8 @@ import java.util.Vector;
 
 public class MainForm {
 
-    private RequestExecutor executor;
-    private JFrame form;
+    private final RequestExecutor executor;
+    private final JFrame form;
     private JTextArea logFromServer;
     private JTextArea list;
     private JButton updateList;
@@ -154,10 +154,6 @@ public class MainForm {
         String line=format.format(currentTime);
         line+=log+"\n";
         logFromServer.append(line);
-    }
-
-    public String getPath(){
-        return executor.getFilePath();
     }
 
 

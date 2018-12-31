@@ -5,15 +5,13 @@ import Message.Operation;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 
 /*package*/ class SelectOperation extends JPanel {
 
 
-    private  MainForm main;
-    private JTabbedPane selector;
+    private final MainForm main;
+    private final JTabbedPane selector;
 
     /*package*/ SelectOperation(MainForm mainForm ){
         super();

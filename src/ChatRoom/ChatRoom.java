@@ -13,7 +13,7 @@ public class ChatRoom implements Runnable {
 
     private DatagramChannel channel;
     private InetSocketAddress chatGroup;
-    private JTextArea chatBox;
+    private final JTextArea chatBox;
 
     public ChatRoom(String multicastGroup,int port,JTextArea box)throws IOException{
         chatBox=box;

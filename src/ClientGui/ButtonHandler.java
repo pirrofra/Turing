@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
@@ -18,12 +17,12 @@ import java.util.Vector;
 
 public class ButtonHandler implements ActionListener {
 
-    private Operation op;
-    private JTextField arg1;
-    private JTextField arg2;
-    private RequestExecutor executor;
-    private JFrame mainFrame;
-    private MainForm main;
+    private final Operation op;
+    private final JTextField arg1;
+    private final JTextField arg2;
+    private final RequestExecutor executor;
+    private final JFrame mainFrame;
+    private final MainForm main;
 
     public ButtonHandler(Operation operation, JTextField field1,JTextField field2, MainForm mainForm){
         op=operation;
@@ -126,7 +125,7 @@ public class ButtonHandler implements ActionListener {
 
     public void actionPerformed(ActionEvent e){
         ResultDialog dialog;
-        mainFrame.disable();
+        main.disable();
         try{
             switch (op){
                 case CREATE:
@@ -150,7 +149,7 @@ public class ButtonHandler implements ActionListener {
             exception.printStackTrace();
             dialog=new ResultDialog( mainFrame,"Connection lost with Server",true,false);
         }
-        mainFrame.enable();
+        main.enable();
         dialog.show(400,100);
     }
 
@@ -159,7 +158,6 @@ public class ButtonHandler implements ActionListener {
         String[] split= docName.split("/");
         Files.createDirectories(Paths.get(executor.getFilePath(),split[0],split[1]));
         dir= Paths.get(executor.getFilePath(),split[0],split[1],filename);
-        FileChannel channel;
         try{
             Files.write(dir,content,StandardOpenOption.TRUNCATE_EXISTING);
         }

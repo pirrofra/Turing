@@ -9,9 +9,9 @@ import java.awt.event.*;
 
 /*package*/ class ResultDialog extends JDialog implements ActionListener {
 
-    private Window father;
-    private boolean closeAppAtExit;
-    private boolean closeFormAtExit;
+    private final Window father;
+    private final boolean closeAppAtExit;
+    private final boolean closeFormAtExit;
 
     /*package*/ ResultDialog( Window f, String message,boolean closeApp,boolean closeForm){
         super(f,"Attention");

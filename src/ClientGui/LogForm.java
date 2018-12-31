@@ -15,16 +15,16 @@ import java.io.IOException;
 
 public class LogForm {
 
-    private RequestExecutor executor;
-    private JDialog form;
+    private final RequestExecutor executor;
+    private final JDialog form;
     private JTextField username;
     private JPasswordField password;
     private JButton login;
     private JButton register;
     private JLabel connectionStatus;
-    private JFrame mainFrame;
+    private final JFrame mainFrame;
     private boolean loggedIn;
-    private MainForm main;
+    private final MainForm main;
 
 
     public LogForm(MainForm father) {

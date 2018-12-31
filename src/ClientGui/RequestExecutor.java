@@ -13,10 +13,10 @@ import java.rmi.registry.Registry;
 
 /*package*/ class RequestExecutor {
 
-    private SocketChannel channel;
-    private String server;
-    private int RMIport;
-    private String filePath;
+    private final SocketChannel channel;
+    private final String server;
+    private final int RMIport;
+    private final String filePath;
 
     /*package*/ RequestExecutor(SocketChannel socket,String hostname,int p,String path){
         channel=socket;

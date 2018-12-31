@@ -71,7 +71,7 @@ import java.util.Vector;
         for(int i=1;i<=numSection;i++){
             sectionPath[i-1]=dir.resolve("."+i);
             try{
-                Files.createFile(sectionPath[i-1]);
+                Files.createFile(sectionPath[i-1],attr);
             }
             catch (FileAlreadyExistsException e){
                 String empty="";
@@ -88,9 +88,8 @@ import java.util.Vector;
      * @param sections number of sections
      * @return new ServerData.Document
      * @throws IllegalArgumentException if docName and/or userCreator are null and if sections in 0 or less
-     * @throws IOException if an error occurs during newDoc.initialize
      */
-    /*package*/ static Document createDocument(String docName,String userCreator,int sections) throws IllegalArgumentException,IOException{
+    /*package*/ static Document createDocument(String docName,String userCreator,int sections) throws IllegalArgumentException {
         Document newDoc=new Document(docName,userCreator,sections);
         newDoc.addUser(userCreator);
         return newDoc;
