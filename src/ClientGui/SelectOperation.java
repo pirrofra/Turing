@@ -1,20 +1,23 @@
 package ClientGui;
 
+import Message.Operation;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 
 /*package*/ class SelectOperation extends JPanel {
 
-    //TODO: Handler bottoni
 
-    private  MainForm father;
+    private  MainForm main;
     private JTabbedPane selector;
 
-    /*package*/ SelectOperation(MainForm creator ){
+    /*package*/ SelectOperation(MainForm mainForm ){
         super();
-        father=creator;
+        main=mainForm;
         setLayout(new BoxLayout(this,BoxLayout.LINE_AXIS));
         selector=new JTabbedPane();
     }
@@ -39,7 +42,8 @@ import java.text.NumberFormat;
         format.setMaximumFractionDigits(0);
         JFormattedTextField numSection=new JFormattedTextField(format);
         JPanel panel=initializeBody("New Document:",docName,"Number of Section:",numSection);
-        panel.add(create);
+        panel.add(textAndLabel(" ",create));
+        create.addActionListener(new ButtonHandler(Operation.CREATE,docName,numSection,main));
         return panel;
     }
 
@@ -49,8 +53,9 @@ import java.text.NumberFormat;
         JButton show=new JButton("Show");
         JTextField docName=new JTextField();
         JPanel body=initializeBody("Document Name",docName);
-        body.add(show);
+        body.add(textAndLabel(" ",show));
         panel.add(body);
+        show.addActionListener(new ButtonHandler(Operation.SHOW,docName,null,main));
         return panel;
     }
 
@@ -61,16 +66,18 @@ import java.text.NumberFormat;
         format.setMaximumFractionDigits(0);
         JFormattedTextField numSection=new JFormattedTextField(format);
         JPanel panel=initializeBody("Document Name",docName,"Section nr:",numSection);
-        panel.add(show);
+        panel.add(textAndLabel(" ",show));
+        show.addActionListener(new ButtonHandler(Operation.SHOW,docName,numSection,main));
         return panel;
     }
 
     private JPanel initializeInviteUserPanel(){
-        JButton edit=new JButton("Invite");
+        JButton invite=new JButton("Invite");
         JTextField docName=new JTextField();
         JTextField user=new JTextField();
         JPanel panel=initializeBody("Document Name",docName,"User Invited",user);
-        panel.add(edit);
+        panel.add(textAndLabel(" ",invite));
+        invite.addActionListener(new ButtonHandler(Operation.INVITE,docName,user,main));
         return panel;
 
     }
@@ -82,7 +89,8 @@ import java.text.NumberFormat;
         format.setMaximumFractionDigits(0);
         JFormattedTextField numSection=new JFormattedTextField(format);
         JPanel panel=initializeBody("Document Name",docName,"Section nr:",numSection);
-        panel.add(edit);
+        panel.add(textAndLabel(" ",edit));
+        edit.addActionListener(new ButtonHandler(Operation.EDIT,docName,numSection,main));
         return panel;
     }
 
@@ -109,7 +117,7 @@ import java.text.NumberFormat;
         return panel;
     }
 
-    private static JPanel textAndLabel(String label,JTextField text){
+    private static JPanel textAndLabel(String label, Component text){
         Border padding=BorderFactory.createEmptyBorder(5,5,5,5);
         JPanel panel=new JPanel();
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));

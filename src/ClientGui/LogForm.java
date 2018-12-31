@@ -9,26 +9,37 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.channels.SocketChannel;
 
 public class LogForm {
 
     private RequestExecutor executor;
-    private JFrame form;
+    private JDialog form;
     private JTextField username;
     private JPasswordField password;
     private JButton login;
     private JButton register;
     private JLabel connectionStatus;
+    private JFrame mainFrame;
+    private boolean loggedIn;
+    private MainForm main;
 
 
-    public LogForm(RequestExecutor exec) {
-        executor=exec;
-        form=new JFrame("Turing Client");
+    public LogForm(MainForm father) {
+        executor=father.getExecutor();
+        mainFrame=father.getMainFrame();
+        main=father;
+        loggedIn=false;
+        form=new JDialog(mainFrame,"Turing Client",true);
+        form.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                super.windowClosed(e);
+                if(!loggedIn)System.exit(0);
+            }
+        });
     }
 
     private void createUIComponents() {
@@ -66,7 +77,6 @@ public class LogForm {
         buttonPanel.add(login);
     }
 
-    //TODO:Passaggio a EditorForm se LOGIN CORRETTO
     private void addButtonListener(){
         login.addActionListener(new ActionListener() {
             @Override
@@ -77,10 +87,9 @@ public class LogForm {
                 try{
                     MessageBuffer result=executor.login(username.getText(),pass);
                     if(result.getOP()==Operation.OK){
-                        dialog=new ResultDialog(form,result.getOP(),false,true);
-                        MainForm main=new MainForm(executor);
-                        main.initialize();
-                        main.show();
+                        dialog=new ResultDialog(form,"Log in is successful!",false,true);
+                        loggedIn=true;
+                        main.update();
                     }
                     else dialog=new ResultDialog(form,result.getOP(),false,false);
                 }
@@ -100,15 +109,21 @@ public class LogForm {
                 ResultDialog dialog;
                 try{
                     Operation result=executor.register(username.getText(),pass);
-                    dialog=new ResultDialog(form,result,false,false);
+                    if(result==Operation.OK) login.doClick();
+                    else {
+                        dialog=new ResultDialog(form,result,false,false);
+                        dialog.show(400,100);
+                    }
                 }
                 catch (IOException exception){
                     dialog=new ResultDialog(form,"Connection lost with Server",true,false);
+                    dialog.show(400,100);
                 }
                 form.setEnabled(true);
-                dialog.show(400,100);
+
             }
         });
+
     }
 
     private static void addWhiteCell(JPanel panel, int num){
@@ -121,24 +136,15 @@ public class LogForm {
         createUIComponents();
         fillForm();
         addButtonListener();
-        form.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        form.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         form.setResizable(false);
-        form.setSize(600,150);
+        form.setPreferredSize(new Dimension(600,150));
+        form.pack();
+        form.setLocationRelativeTo(mainFrame);
     }
 
     public void show(){
-        //TODO: vedere se form.show va bene lo stesso
         form.setVisible(true);
-    }
-    public static void main(String[] args) throws IOException{
-        SocketChannel channel=SocketChannel.open();
-        InetAddress addr= InetAddress.getByName("localhost");
-        SocketAddress addr2=new InetSocketAddress(addr,55432);
-        channel.connect(addr2);
-        RequestExecutor exec=new RequestExecutor(channel,"localhost",55431,"files/");
-        LogForm log=new LogForm(exec);
-        log.initialize();
-        log.show();
     }
 
 }

@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -30,6 +31,7 @@ import java.util.Vector;
  */
 /*package*/ class Document implements Serializable {
 
+    //TODO:FIles.write invece di canali
     //TODO:implementare la gestione dell'Indirizzo per il MulticastSocket
     private static final int maxSize=Integer.MAX_VALUE; //TODO:capire valore adatto
     private String documentName;
@@ -61,12 +63,21 @@ import java.util.Vector;
      * @param path directory where all documents are stored
      * @throws IOException if an error occurs during CreateFile
      */
-    private void initialize(String path) throws IOException {
+    /*package*/ void initialize(String path) throws IOException {
         Path dir=Paths.get(path,creator,documentName);
         Files.createDirectories(dir);
+        Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-------");
+        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
         for(int i=1;i<=numSection;i++){
             sectionPath[i-1]=dir.resolve("."+i);
-            Files.createFile(sectionPath[i-1]);
+            try{
+                Files.createFile(sectionPath[i-1]);
+            }
+            catch (FileAlreadyExistsException e){
+                String empty="";
+                Files.write(sectionPath[i-1],empty.getBytes(),StandardOpenOption.TRUNCATE_EXISTING);
+            }
+
         }
     }
 
@@ -75,14 +86,12 @@ import java.util.Vector;
      * @param docName ServerData.Document name
      * @param userCreator user who created the document
      * @param sections number of sections
-     * @param Path directory where all documents are stored
      * @return new ServerData.Document
      * @throws IllegalArgumentException if docName and/or userCreator are null and if sections in 0 or less
      * @throws IOException if an error occurs during newDoc.initialize
      */
-    /*package*/ static Document createDocument(String docName,String userCreator,int sections, String Path) throws IllegalArgumentException,IOException{
+    /*package*/ static Document createDocument(String docName,String userCreator,int sections) throws IllegalArgumentException,IOException{
         Document newDoc=new Document(docName,userCreator,sections);
-        newDoc.initialize(Path);
         newDoc.addUser(userCreator);
         return newDoc;
     }
@@ -136,12 +145,15 @@ import java.util.Vector;
         }
         StringBuilder info=new StringBuilder();
         info.append("Section currently edited: ");
+        boolean allfree=true;
         for(int i=0;i<numSection;i++){
             if(currentEdited[i]!=null) {
+                allfree=false;
                 info.append(i);
-                info.append("\n");
+                info.append("- ");
             }
         }
+        if(allfree) info.append("none");
         ByteBuffer completeDocument=ByteBuffer.allocate(dimension);
         for(Path path:sectionPath){
             ByteBuffer section=openFile(path);
@@ -214,18 +226,20 @@ import java.util.Vector;
      */
     /*package*/ synchronized String getInfo(){
         StringBuilder builder=new StringBuilder();
+        builder.append(creator);
+        builder.append("/");
         builder.append(documentName);
         builder.append("\n");
-        builder.append("Creator: ");
+        builder.append("    Creator: ");
         builder.append(creator);
         builder.append("\n");
-        builder.append("Invited User: ");
+        builder.append("    Invited User: ");
         for(String user:userInvited){
-            builder.append(user);
+            if(user.compareTo(creator)!=0)builder.append(user);
             builder.append(" ");
         }
         builder.append("\n");
-        builder.append("Number of Section: ");
+        builder.append("    Number of Section: ");
         builder.append(numSection);
         builder.append("\n");
         return builder.toString();
@@ -250,12 +264,7 @@ import java.util.Vector;
      * @throws IOException if an error occurs during I/O operation on the file
      */
     private static void saveFile(Path path,byte[] file) throws IOException{
-        FileChannel channel=FileChannel.open(path, StandardOpenOption.TRUNCATE_EXISTING);
-        ByteBuffer FileBuffer=ByteBuffer.wrap(file);
-        while(FileBuffer.hasRemaining()){
-            channel.write(FileBuffer);
-        }
-        channel.close();
+        Files.write(path,file,StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     /**
@@ -266,7 +275,15 @@ import java.util.Vector;
      */
     private static ByteBuffer openFile(Path path) throws IOException{
         FileChannel file=FileChannel.open(path,StandardOpenOption.READ);
-        return file.map(FileChannel.MapMode.READ_ONLY,0,file.size());
+        int size=(int)file.size();
+        ByteBuffer buffer=ByteBuffer.allocate(size);
+        while (size>0){
+            int byteRead=file.read(buffer);
+            if(byteRead<0) throw  new IOException();
+            size-=byteRead;
+        }
+        buffer.flip();
+        return buffer;
     }
 
 }

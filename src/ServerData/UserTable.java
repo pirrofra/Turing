@@ -133,4 +133,8 @@ import java.util.concurrent.ConcurrentHashMap;
         }
         return null;
     }
+
+    /*package*/ boolean userExist(String username){
+        return userMap.containsKey(username);
+    }
 }

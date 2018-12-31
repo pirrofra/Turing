@@ -58,12 +58,20 @@ import java.util.concurrent.ConcurrentHashMap;
     /*package*/ Operation createDocument(String name, String creator, int numSections) throws IllegalArgumentException{
         Document newDoc;
         try{
-            newDoc=Document.createDocument(name,creator,numSections,docPath);
+            newDoc=Document.createDocument(name,creator,numSections);
         }
         catch (IOException e){
             return Operation.FAIL;
         }
-        if(docMap.putIfAbsent(creator+"/"+name,newDoc)==null) return Operation.OK;
+        if(docMap.putIfAbsent(creator+"/"+name,newDoc)==null) {
+            try{
+                newDoc.initialize(docPath);
+                return Operation.OK;
+            }
+            catch (IOException e){
+                return Operation.FAIL;
+            }
+        }
         else return Operation.NAME_NOT_AVAILABLE;
     }
 

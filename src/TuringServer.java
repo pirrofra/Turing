@@ -36,6 +36,8 @@ import java.util.concurrent.*;
  */
 public class TuringServer {
 
+    //TODO: Serializzazione o pulizia di dirPath
+
     private static int numThreads;
     private static String dirPath;
     private static  String bakPath;

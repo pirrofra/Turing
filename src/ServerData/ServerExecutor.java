@@ -69,6 +69,7 @@ public class ServerExecutor implements Runnable {
         String docName=new String(Args.get(0));
         int numSection= ByteBuffer.wrap(Args.get(1)).getInt();
         Operation result=documents.createDocument(docName,user,numSection);
+        if(result==Operation.OK) users.addDocument(user,user+"/"+docName);
         return MessageBuffer.createMessageBuffer(result);
     }
 
@@ -83,8 +84,10 @@ public class ServerExecutor implements Runnable {
         if(Args.size()!=2) throw new IllegalArgumentException();
         String docName=new String(Args.get(0));
         String invited=new String(Args.get(1));
-        Operation result=documents.invite(docName,user,invited);
-        if(result==Operation.OK) users.addDocument(user,docName);
+        Operation result;
+        if(users.userExist(invited)) result=documents.invite(docName,user,invited);
+        else result=Operation.USER_NOT_FOUND;
+        if(result==Operation.OK) users.addDocument(invited,docName);
         return MessageBuffer.createMessageBuffer(result);
     }
 
@@ -138,7 +141,7 @@ public class ServerExecutor implements Runnable {
         Operation result=users.edit(user,docName);
         if(result==Operation.OK) return documents.edit(docName,user,section);
         else{
-            users.endEdit(user);
+            if(result!=Operation.USER_ALREADY_EDITING) users.endEdit(user);
             return MessageBuffer.createMessageBuffer(result);
         }
     }

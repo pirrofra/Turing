@@ -1,14 +1,22 @@
 package ClientGui;
 
 
+import Message.MessageBuffer;
+import Message.Operation;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Vector;
 
 public class MainForm {
 
@@ -25,13 +33,46 @@ public class MainForm {
         form=new JFrame("Turing Client");
     }
 
+
+    //TODO:LOGOUT EVENT
     private void createUIComponents(){
         logFromServer=new JTextArea();
         logFromServer.setEditable(false);
         list=new JTextArea();
         list.setEditable(false);
         updateList=new JButton("update");
+        updateList.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MessageBuffer result;
+                ResultDialog dialog;
+                disable();
+                try {
+                    result= executor.list();
+                    Vector<byte []> args=result.getArgs();
+                    if(result.getOP()== Operation.OK && args.size()==1){
+                        list.setText(new String(args.get(0)));
+                        enable();
+                        return;
+                    }
+                    else
+                        dialog=new ResultDialog(form,result.getOP(),false,false);
+
+                }
+                catch (IOException exception){
+                    dialog=new ResultDialog(form,"Connection lost with Server",true,false);
+                }
+                enable();
+                dialog.show(400,100);
+            }
+        });
         logout=new JButton("Log out");
+        logout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
         try{
             connectionStatus=new JLabel("Connection with " +executor.getRemoteAddress()+" live");
         }
@@ -55,6 +96,10 @@ public class MainForm {
 
     private void initializeBoxLayout(JPanel panel){
         JPanel firstLine=new JPanel();
+        JScrollPane listPanel=new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        listPanel.setPreferredSize(new Dimension(760,200));
+        JScrollPane logPanel=new JScrollPane(logFromServer,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        logPanel.setPreferredSize(new Dimension(760,200));
         JPanel secondLine=new JPanel();
         SelectOperation select=new SelectOperation(this);
         select.initialize();
@@ -70,11 +115,11 @@ public class MainForm {
         secondLine.add(Box.createGlue());
         panel.add(firstLine);
         panel.add(Box.createRigidArea(new Dimension(0,5)));
-        panel.add(list);
+        panel.add(listPanel);
         panel.add(Box.createRigidArea(new Dimension(0,15)));
         panel.add(secondLine);
         panel.add(Box.createRigidArea(new Dimension(0,5)));
-        panel.add(logFromServer);
+        panel.add(logPanel);
         panel.add(Box.createRigidArea(new Dimension(0,5)));
         panel.add(select);
     }
@@ -90,10 +135,25 @@ public class MainForm {
     public void show(){
         form.pack();
         form.setVisible(true);
+        LogForm login=new LogForm(this);
+        login.initialize();
+        login.show();
+    }
+
+    public RequestExecutor getExecutor(){
+        return executor;
+    }
+
+    public JFrame getMainFrame(){
+        return form;
     }
 
     public void addLog(String log){
-        logFromServer.append(log);
+        Date currentTime=new Date(System.currentTimeMillis());
+        SimpleDateFormat format=new SimpleDateFormat("[dd/MM hh:mm:ss] - ");
+        String line=format.format(currentTime);
+        line+=log+"\n";
+        logFromServer.append(line);
     }
 
     public String getPath(){
@@ -106,17 +166,21 @@ public class MainForm {
         InetAddress addr= InetAddress.getByName("localhost");
         SocketAddress addr2=new InetSocketAddress(addr,55432);
         channel.connect(addr2);
-        RequestExecutor exec=new RequestExecutor(channel,"localhost",55431,"files/");
+        RequestExecutor exec=new RequestExecutor(channel,"localhost",55431,"filesClient/");
         MainForm log=new MainForm(exec);
         log.initialize();
         log.show();
     }
 
     public void disable(){
-        form.disable();
+        form.setEnabled(false);
     }
 
     public void enable(){
-        form.enable();
+        form.setEnabled(true);
+    }
+
+    public void update(){
+        updateList.doClick();
     }
 }
