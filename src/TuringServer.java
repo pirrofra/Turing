@@ -36,11 +36,10 @@ import java.util.concurrent.*;
  */
 public class TuringServer {
 
-    //TODO: Serializzazione o pulizia di dirPath
+    //TODO: pulizia di DirPath. ATTENZIONE che cancella ricorsivamente
 
     private static int numThreads;
     private static String dirPath;
-    private static  String bakPath;
     private static String baseAddress;
     private static int bound;
     private static int portRMI;
@@ -172,7 +171,6 @@ public class TuringServer {
             output.close();
         }
        dirPath=config.getProperty("dirPath");
-       bakPath=config.getProperty("bakPath");
        baseAddress=config.getProperty("MulticastBaseAddress");
        bound=getIntegerProperty("MulticastBound");
        numThreads=getIntegerProperty("numThreads");
@@ -188,7 +186,6 @@ public class TuringServer {
      */
    private static void setDefault(){
        defaultConfig.setProperty("dirPath","files/");
-       defaultConfig.setProperty("bakPath","bak/");
        defaultConfig.setProperty("MulticastBaseAddress","239.0.0.0");
        defaultConfig.setProperty("MulticastBound","10000");
        defaultConfig.setProperty("numThreads","8");

@@ -3,8 +3,10 @@ package ServerData;
 import ChatRoom.ChatOrganizer;
 import RemoteUserTable.RemoteUserTable;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.channels.SocketChannel;
+import java.nio.file.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -101,10 +103,24 @@ public class ServerData implements Serializable {
      * @return new ServerData instance
      * @throws RemoteException an exception thrown by the RMI-support if an error occurs
      */
-    public static ServerData createServerData(String path,String baseAddress,int bound,int chatPort,int RMIport) throws RemoteException{
+    public static ServerData createServerData(String path,String baseAddress,int bound,int chatPort,int RMIport) throws IOException{
         ServerData newData=new ServerData(path,baseAddress,bound,chatPort);
         newData.activateRMI(RMIport);
+        deleteDir(Paths.get(path));
         return newData;
     }
+
+    private static void deleteDir(Path path) throws IOException{
+        if(Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)){
+            DirectoryStream<Path> files=Files.newDirectoryStream(path);
+            for(Path entry:files){
+                deleteDir(entry);
+            }
+        }
+        if(Files.exists(path))
+            Files.delete(path);
+
+    }
+
 
 }
