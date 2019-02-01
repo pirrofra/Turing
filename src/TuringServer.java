@@ -37,7 +37,6 @@ import java.util.concurrent.*;
 public class TuringServer {
 
     //TODO: Serializzazione o pulizia di dirPath
-    //TODO: Se si richiede una sezione che qualcuno stava già editando, l'utente risulta come se stesse già editando
 
     private static int numThreads;
     private static String dirPath;

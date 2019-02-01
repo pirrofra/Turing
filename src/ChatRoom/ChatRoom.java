@@ -49,13 +49,16 @@ public class ChatRoom extends Thread {
             ByteBuffer buffer=ByteBuffer.allocate(2048);
             try{
                 channel.receive(buffer);
+                buffer.flip();
+                String msg=new String(buffer.array());
+                chatBox.append(msg+"\n");
             }
             catch (IOException e){
                 chatBox.append("--- CHAT CRASHED ---\n");
+                break;
             }
-            buffer.flip();
-            String msg=new String(buffer.array());
-            chatBox.append(msg+"\n");
+
+            chatBox.setCaretPosition(chatBox.getText().length());
         }
         try{
             channel.close();

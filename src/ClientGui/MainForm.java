@@ -165,6 +165,7 @@ public class MainForm extends JFrame {
         String line=format.format(currentTime);
         line+=log+"\n";
         logFromServer.append(line);
+        logFromServer.setCaretPosition(logFromServer.getText().length());
     }
 
 

@@ -20,8 +20,6 @@ import java.util.Vector;
 
 /*package*/ class EditorForm extends JDialog{
 
-    //TODO: Jscroll non rimane in basso
-
     private final MainForm mainFrame;
     private final Path filePath;
     private final RequestExecutor executor;
@@ -114,12 +112,12 @@ import java.util.Vector;
     }
 
     private JPanel initializeChatBox(){
-        JPanel chatBox=new JPanel();
-        chatBox.setLayout(new BoxLayout(chatBox,BoxLayout.PAGE_AXIS));
-        chatBox.add(scrollableChatText());
-        chatBox.add(Box.createVerticalGlue());
-        chatBox.add(sendMessageBox());
-        return chatBox;
+        JPanel chatPanel=new JPanel();
+        chatPanel.setLayout(new BoxLayout(chatPanel,BoxLayout.PAGE_AXIS));
+        chatPanel.add(scrollableChatText());
+        chatPanel.add(Box.createVerticalGlue());
+        chatPanel.add(sendMessageBox());
+        return chatPanel;
     }
 
     private JScrollPane scrollableChatText(){

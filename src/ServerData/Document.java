@@ -33,7 +33,7 @@ import java.util.Vector;
 /*package*/ class Document implements Serializable {
 
 
-    private static final int maxSize=Integer.MAX_VALUE; //TODO:capire valore adatto
+    private static final int maxSize=Integer.MAX_VALUE; //TODO:Impostare un valore massimo alle sezioni dei file
     private String documentName;
     private String creator;
     private int numSection;

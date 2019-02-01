@@ -142,11 +142,16 @@ public class ServerExecutor implements Runnable {
         String docName=new String(Args.get(0));
         int section=ByteBuffer.wrap(Args.get(1)).getInt();
         Operation result=users.edit(user,docName);
-        if(result==Operation.OK) return documents.edit(docName,user,section);
+        MessageBuffer message;
+        if(result==Operation.OK) {
+            message= documents.edit(docName,user,section);
+            if(message.getOP()!=Operation.OK) users.endEdit(user);
+        }
         else{
             if(result!=Operation.USER_ALREADY_EDITING) users.endEdit(user);
-            return MessageBuffer.createMessageBuffer(result);
+            message= MessageBuffer.createMessageBuffer(result);
         }
+        return message;
     }
 
     /**

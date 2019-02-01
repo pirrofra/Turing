@@ -41,8 +41,7 @@ import java.util.Vector;
             return  new ResultDialog(main,"Number of Sections in not an integer",false,false);
         }
         MessageBuffer result=executor.createDocument(arg1.getText(),value);
-        Date currentTime=new Date(System.currentTimeMillis());
-        String log=currentTime.toString()+": ";
+        String log="";
         if(result.getOP()==Operation.OK)
             log+="Document "+arg1.getText()+" successfully created with "+value+" sections";
         else
