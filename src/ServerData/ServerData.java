@@ -33,11 +33,11 @@ public class ServerData implements Serializable {
      * Private class constructor
      * @param path Path to use for storing documents
      */
-    private ServerData(String path,String baseAddress,int bound) {
+    private ServerData(String path,String baseAddress,int bound,int port) {
         users=new UserTable();
         documents=new DocumentTable(path);
         connectedUsers=new ConcurrentHashMap<>();
-        chat=new ChatOrganizer(baseAddress,bound);
+        chat=new ChatOrganizer(baseAddress,bound,port);
     }
 
     /**
@@ -47,11 +47,11 @@ public class ServerData implements Serializable {
      * @param loadFactor Hash Table load factor
      * @param concurrencyLevel max number of concurrent access
      */
-    private ServerData(String path,String baseAddress,int bound, int initialCapacity, float loadFactor, int concurrencyLevel) {
+    private ServerData(String path,String baseAddress,int bound,int port, int initialCapacity, float loadFactor, int concurrencyLevel) {
         users=new UserTable(initialCapacity,loadFactor,concurrencyLevel);
         documents=new DocumentTable(path,initialCapacity,loadFactor,concurrencyLevel);
         connectedUsers=new ConcurrentHashMap<>();
-        chat=new ChatOrganizer(baseAddress,bound);
+        chat=new ChatOrganizer(baseAddress,bound,port);
     }
 
     /**
@@ -101,8 +101,8 @@ public class ServerData implements Serializable {
      * @return new ServerData instance
      * @throws RemoteException an exception thrown by the RMI-support if an error occurs
      */
-    public static ServerData createServerData(String path,String baseAddress,int bound,int RMIport) throws RemoteException{
-        ServerData newData=new ServerData(path,baseAddress,bound);
+    public static ServerData createServerData(String path,String baseAddress,int bound,int chatPort,int RMIport) throws RemoteException{
+        ServerData newData=new ServerData(path,baseAddress,bound,chatPort);
         newData.activateRMI(RMIport);
         return newData;
     }

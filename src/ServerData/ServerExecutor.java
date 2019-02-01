@@ -165,7 +165,7 @@ public class ServerExecutor implements Runnable {
         return MessageBuffer.createMessageBuffer(result);
     }
 
-    private MessageBuffer charRoom(Vector<byte[]> Args,String user) throws IllegalArgumentException{
+    private MessageBuffer chatRoom(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=1) throw new IllegalArgumentException();
         String docName=new String(Args.get(0));
         return documents.getChatAddress(docName,user,chat);
@@ -215,7 +215,7 @@ public class ServerExecutor implements Runnable {
                     reply=edit(Args,user);
                     break;
                 case CHAT_ROOM: System.out.println("Join Chat request received from "+user);
-                    reply=charRoom(Args,user);
+                    reply=chatRoom(Args,user);
                     break;
                 case END_EDIT:  System.out.println("End Edit request received from "+user);
                     reply=end_edit(Args,user);

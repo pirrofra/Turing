@@ -14,7 +14,7 @@ public class ChatRoom extends Thread {
     private DatagramChannel channel;
     private InetSocketAddress chatGroup;
     private final JTextArea chatBox;
-    private String user;
+    private final String user;
 
     public ChatRoom(String multicastGroup,int port,JTextArea box,String username)throws IOException{
         super();

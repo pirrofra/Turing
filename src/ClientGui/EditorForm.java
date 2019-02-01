@@ -18,12 +18,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Vector;
 
-public class EditorForm {
+/*package*/ class EditorForm extends JDialog{
 
-    //TODO: Se si perde la connessione con il server lancia comunque un errore di Retry
     //TODO: Jscroll non rimane in basso
 
-    private final JDialog form;
     private final MainForm mainFrame;
     private final Path filePath;
     private final RequestExecutor executor;
@@ -33,23 +31,23 @@ public class EditorForm {
     private final int section;
     private boolean isEditing;
 
-    public EditorForm(MainForm father,String doc,int numSect,Path file,String group,int port){
+    /*package*/ EditorForm(MainForm father,String doc,int numSect,Path file){
+        super(father,"Turing Client",true);
         mainFrame=father;
         filePath=file;
         executor=father.getExecutor();
         chat=null;
         chatBox=new JTextArea();
         chatBox.setEditable(false);
-        form=new JDialog(father.getMainFrame(),"Turing Client",true);
         docName=doc;
         section=numSect;
         isEditing=true;
-        form.addWindowListener(new WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
                 if(isEditing){
-                    ResultDialog dialog=new ResultDialog(mainFrame.getMainFrame(),"Editing interrupted. Closing APP",true,false);
+                    ResultDialog dialog=new ResultDialog(mainFrame,"Editing interrupted. Closing APP",true,false);
                     dialog.show(400,100);
                 }
                 chat.interrupt();
@@ -72,13 +70,14 @@ public class EditorForm {
         content.add(initializeFileInfo());
         content.add(Box.createRigidArea(new Dimension(0,5)));
         content.add(initializeChatBox());
-        form.add(content,BorderLayout.CENTER);
-        form.add(connectionStatus,BorderLayout.SOUTH);
+        add(content,BorderLayout.CENTER);
+        add(connectionStatus,BorderLayout.SOUTH);
 
 
     }
 
     private JPanel initializeFileInfo(){
+        JDialog me=this;
         JPanel firstLine=new JPanel();
         firstLine.setLayout(new BoxLayout(firstLine,BoxLayout.LINE_AXIS));
         firstLine.add(new JLabel("Currently Editing file: "+filePath.toString()));
@@ -87,20 +86,27 @@ public class EditorForm {
         firstLine.add(end);
         end.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                form.setEnabled(false);
+                setEnabled(false);
                 ResultDialog dialog;
                 try{
-                    ByteBuffer file=openFile(filePath);
-                    MessageBuffer result=executor.endEdit(docName,section,file.array());
-                    if(result.getOP()== Operation.OK)
-                        isEditing=false;
-                    dialog=new ResultDialog(form,result.getOP(),false,true);
+                    ByteBuffer file=readFile(filePath);
+                    if (file==null) {
+                        dialog=new ResultDialog(me,"Error while opening file. Retry",false,false);
+                    }
+                    else{
+                        MessageBuffer result=executor.endEdit(docName,section,file.array());
+                        if(result.getOP()== Operation.OK)
+                            isEditing=false;
+                        dialog=new ResultDialog(me,result.getOP(),false,true);
 
+                    }
                 }
-                catch (IOException exc){
-                    dialog=new ResultDialog(form,"Error while opening file. Retry",false,false);
+                catch (IOException exception) {
+                    exception.printStackTrace();
+                    dialog = new ResultDialog(mainFrame, "Connection lost with Server", true, false);
                 }
-                form.setEnabled(true);
+
+                setEnabled(true);
                 dialog.show(400,100);
             }
         });
@@ -123,6 +129,7 @@ public class EditorForm {
     }
 
     private JPanel sendMessageBox(){
+        JDialog me=this;
         JPanel messageLine=new JPanel();
         JTextField mex=new JTextField();
         JButton send=new JButton("Send");
@@ -137,7 +144,7 @@ public class EditorForm {
                     chat.sendMessage(mex.getText());
                 }
                 catch (IOException exception){
-                    ResultDialog dialog=new ResultDialog(form,"Message couldn't be sent",false,false);
+                    ResultDialog dialog=new ResultDialog(me,"Message couldn't be sent",false,false);
                     dialog.show(400,100);
                 }
                 mex.setText("");
@@ -146,26 +153,27 @@ public class EditorForm {
         return messageLine;
     }
 
-    public void initialize(int port){
+    /*package*/ void initialize(){
         fillForm();
-        startChat(port);
+        startChat();
     }
 
-    public void show(){
-        form.setPreferredSize(new Dimension(800,600));
-        form.pack();
-        form.setLocationRelativeTo(mainFrame.getMainFrame());
-        form.setVisible(true);
+    /*package*/ void open(){
+        setPreferredSize(new Dimension(800,600));
+        pack();
+        setLocationRelativeTo(mainFrame);
+        setVisible(true);
     }
 
-    private void startChat(int port){
+    private void startChat(){
         MessageBuffer result;
         try{
             result=executor.chatRoom(docName);
             Vector<byte[]> Args=result.getArgs();
             if(result.getOP()==Operation.OK){
                 String address=new String(Args.get(0));
-                String user=new String(Args.get(1));
+                int port=ByteBuffer.wrap(Args.get(1)).getInt();
+                String user=new String(Args.get(2));
                 chat=new ChatRoom(address,port,chatBox,user);
                 chatBox.append("Chat on "+address+" started\n");
                 chat.start();
@@ -175,24 +183,28 @@ public class EditorForm {
             }
         }
         catch (IOException e){
-            ResultDialog dialog=new ResultDialog(form,"Error while opening chat",false,false);
+            ResultDialog dialog=new ResultDialog(this,"Error while opening chat",false,false);
             dialog.show(400,100);
             chatBox.append("--- CHAT CRASHED ---\n");
         }
     }
 
-    private static ByteBuffer openFile(Path path) throws IOException{
-        FileChannel file=FileChannel.open(path, StandardOpenOption.READ);
-        int size=(int)file.size();
-        ByteBuffer buffer=ByteBuffer.allocate(size);
-        while (size>0){
-            int byteRead=file.read(buffer);
-            if(byteRead<0) throw  new IOException();
-            size-=byteRead;
+    private static ByteBuffer readFile(Path path){
+        try{
+            FileChannel file=FileChannel.open(path, StandardOpenOption.READ);
+            int sizeFile=(int)file.size();
+            ByteBuffer buffer=ByteBuffer.allocate(sizeFile);
+            while (sizeFile>0){
+                int byteRead=file.read(buffer);
+                if(byteRead<0) throw  new IOException();
+                sizeFile-=byteRead;
+            }
+            buffer.flip();
+            return buffer;
         }
-        buffer.flip();
-        return buffer;
+        catch (IOException e){
+            return null;
+        }
     }
-
 
 }

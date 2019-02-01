@@ -10,30 +10,22 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.channels.SocketChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
 import java.util.Vector;
 
-public class MainForm {
+public class MainForm extends JFrame {
 
     private final RequestExecutor executor;
-    private final JFrame form;
     private JTextArea logFromServer;
     private JTextArea list;
     private JButton updateList;
     private JButton logout;
     private JLabel connectionStatus;
-    private final int chatPort;
 
-    public MainForm(RequestExecutor exec,int port){
+    public MainForm(RequestExecutor exec){
+        super("Turing Client");
         executor=exec;
-        form=new JFrame("Turing Client");
-        chatPort=port;
     }
 
 
@@ -43,28 +35,29 @@ public class MainForm {
         list=new JTextArea();
         list.setEditable(false);
         updateList=new JButton("update");
+        JFrame mainFrame=this;
         updateList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MessageBuffer result;
                 ResultDialog dialog;
-                disable();
+                setEnabled(false);
                 try {
                     result= executor.list();
                     Vector<byte []> args=result.getArgs();
                     if(result.getOP()== Operation.OK && args.size()==1){
                         list.setText(new String(args.get(0)));
-                        enable();
+                        setEnabled(true);
                         return;
                     }
                     else
-                        dialog=new ResultDialog(form,result.getOP(),false,false);
+                        dialog=new ResultDialog(mainFrame,result.getOP(),false,false);
 
                 }
                 catch (IOException exception){
-                    dialog=new ResultDialog(form,"Connection lost with Server",true,false);
+                    dialog=new ResultDialog(mainFrame,"Connection lost with Server",true,false);
                 }
-                enable();
+                setEnabled(true);
                 dialog.show(400,100);
             }
         });
@@ -74,7 +67,7 @@ public class MainForm {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                disable();
+                setEnabled(false);
                 ResultDialog dialog;
                 try{
                     MessageBuffer result=executor.logout();
@@ -83,16 +76,16 @@ public class MainForm {
                         logForm.initialize();
                         logFromServer.setText("");
                         list.setText("");
-                        logForm.show();
+                        logForm.setVisible(true);
                         dialog=null;
                     }
-                    else dialog=new ResultDialog(form,result.getOP(),true,false);
+                    else dialog=new ResultDialog(mainForm,result.getOP(),true,false);
                 }
                 catch (IOException exception){
-                    dialog=new ResultDialog(form,"Connection lost with Server",true,false);
+                    dialog=new ResultDialog(mainForm,"Connection lost with Server",true,false);
                 }
-                if(dialog!=null)dialog.show();
-                enable();
+                if(dialog!=null)dialog.setVisible(true);
+                setEnabled(true);
             }
         });
         try{
@@ -108,8 +101,8 @@ public class MainForm {
         JPanel infoPanel=new JPanel();
         Border padding= BorderFactory.createEmptyBorder(10,10,0,10);
         formPanel.setBorder(padding);
-        form.add(formPanel,BorderLayout.CENTER);
-        form.add(connectionStatus,BorderLayout.SOUTH);
+        add(formPanel,BorderLayout.CENTER);
+        add(connectionStatus,BorderLayout.SOUTH);
         initializeBoxLayout(infoPanel);
         formPanel.add(infoPanel);
 
@@ -149,28 +142,24 @@ public class MainForm {
     public void initialize(){
         createUIComponents();
         fillForm();
-        form.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        form.setResizable(false);
-        form.setPreferredSize(new Dimension(800,600));
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
+        setPreferredSize(new Dimension(800,600));
     }
 
-    public void show(){
-        form.pack();
-        form.setVisible(true);
+    public void open(){
+        setVisible(true);
+        pack();
         LogForm login=new LogForm(this);
         login.initialize();
-        login.show();
+        login.setVisible(true);
     }
 
-    public RequestExecutor getExecutor(){
+    /*package*/ RequestExecutor getExecutor(){
         return executor;
     }
 
-    public JFrame getMainFrame(){
-        return form;
-    }
-
-    public void addLog(String log){
+    /*package*/ void addLog(String log){
         Date currentTime=new Date(System.currentTimeMillis());
         SimpleDateFormat format=new SimpleDateFormat("[dd/MM hh:mm:ss] - ");
         String line=format.format(currentTime);
@@ -179,32 +168,8 @@ public class MainForm {
     }
 
 
-    public static void main(String[] args) throws IOException{
-        SocketChannel channel=SocketChannel.open();
-        InetAddress addr= InetAddress.getByName("localhost");
-        SocketAddress addr2=new InetSocketAddress(addr,55432);
-        channel.connect(addr2);
-        RequestExecutor exec=new RequestExecutor(channel,"localhost",55431,"filesClient/");
-        Scanner in=new Scanner(System.in);
-        int port=in.nextInt();
-        MainForm log=new MainForm(exec,port);
-        log.initialize();
-        log.show();
-    }
-
-    public void disable(){
-        form.setEnabled(false);
-    }
-
-    public void enable(){
-        form.setEnabled(true);
-    }
-
-    public void update(){
+    /*package*/ void update(){
         updateList.doClick();
     }
 
-    public int getPort(){
-        return chatPort;
-    }
 }

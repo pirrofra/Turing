@@ -267,7 +267,9 @@ import java.util.Vector;
         }
         if(permission){
             if(chatAddress==null) chatAddress=chat.getNewAddress();
-            return MessageBuffer.createMessageBuffer(Operation.OK,chatAddress.getBytes(),user.getBytes());
+            ByteBuffer buffer=ByteBuffer.allocate(4);
+            buffer.putInt(chat.getPort());
+            return MessageBuffer.createMessageBuffer(Operation.OK,chatAddress.getBytes(),buffer.array(),user.getBytes());
         }
         else return MessageBuffer.createMessageBuffer(Operation.EDITING_NOT_REQUESTED);
     }
@@ -307,8 +309,8 @@ import java.util.Vector;
                 empty=false;
         }
         if(empty) {
-            chatAddress=null;
             chat.closeRoom(chatAddress);
+            chatAddress=null;
         }
     }
 

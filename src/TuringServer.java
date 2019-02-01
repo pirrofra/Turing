@@ -47,6 +47,7 @@ public class TuringServer {
     private static int portRMI;
     private static int portTCP;
     private static int timeout;
+    private static int portChat;
 
     private static ServerData data;
     private static Selector selector=null;
@@ -66,7 +67,7 @@ public class TuringServer {
         config=new Properties(defaultConfig);
         try {
             setProperties();
-            data=ServerData.createServerData(dirPath,baseAddress,bound,portRMI);
+            data=ServerData.createServerData(dirPath,baseAddress,bound,portChat,portRMI);
             dispatcher= openDispatcher();
             selector= Selector.open();
             dispatcher.register(selector, SelectionKey.OP_ACCEPT);
@@ -179,6 +180,8 @@ public class TuringServer {
        portTCP=getIntegerProperty("portTCP");
        portRMI=getIntegerProperty("portRMI");
        timeout=getIntegerProperty("timeout");
+       portChat=getIntegerProperty("portChat");
+
    }
 
     /**
@@ -193,6 +196,7 @@ public class TuringServer {
        defaultConfig.setProperty("portTCP","55432");
        defaultConfig.setProperty("portRMI","55431");
        defaultConfig.setProperty("timeout","1000");
+       defaultConfig.setProperty("portChat","56127");
    }
 
     /**

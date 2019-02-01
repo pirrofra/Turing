@@ -11,14 +11,14 @@ import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-/*package*/ class RequestExecutor {
+public class RequestExecutor {
 
     private final SocketChannel channel;
     private final String server;
     private final int RMIport;
     private final String filePath;
 
-    /*package*/ RequestExecutor(SocketChannel socket,String hostname,int p,String path){
+public RequestExecutor(SocketChannel socket,String hostname,int p,String path){
         channel=socket;
         server=hostname;
         RMIport=p;

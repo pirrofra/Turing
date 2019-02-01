@@ -5,12 +5,13 @@ import java.util.Random;
 
 public class ChatOrganizer {
 
-    private HashSet<String> usedAddress;
+    private final HashSet<String> usedAddress;
+    private final int port;
     private int base;
-    private int bound;
-    private Random randomGenerator;
+    private final int bound;
+    private final Random randomGenerator;
 
-    public  ChatOrganizer(String baseAddress,int boundNum){
+    public  ChatOrganizer(String baseAddress,int boundNum,int p){
         usedAddress=new HashSet<>();
         base=0;
         String[] ipAddressSplit=baseAddress.split("\\.");
@@ -19,6 +20,7 @@ public class ChatOrganizer {
             base|= value<<(i*8);
         }
         bound=boundNum;
+        port=p;
         randomGenerator=new Random(System.currentTimeMillis());
     }
 
@@ -45,5 +47,9 @@ public class ChatOrganizer {
                 ((value >> 16 ) & 0xFF) + "." +
                 ((value >>  8 ) & 0xFF) + "." +
                 ( value        & 0xFF);
+    }
+
+    public int getPort(){
+        return port;
     }
 }
