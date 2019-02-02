@@ -13,6 +13,7 @@ import java.util.Properties;
 
 public class TuringClient{
 
+    //TODO: Invio nella chat permette di mandare un messaggio
 
     private static int portTCP;
     private static int portRMI;

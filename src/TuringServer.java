@@ -37,6 +37,11 @@ import java.util.concurrent.*;
 public class TuringServer {
 
     //TODO: pulizia di DirPath. ATTENZIONE che cancella ricorsivamente
+    //TODO: Le sezioni editate che compaiono quando qualcuno preme show document, parte da 0
+    //TODO: Notifica degli inviti! IMPORTANTISSIMO
+    //TODO: Cancellare tutti gli spazi, "/" e "\" dai nomi dei documenti e degli utenti
+    //TODO: Se si chiede una sezione inesistente, l'utente rimane che sta editando un file
+    //TODO:Impostare un valore massimo alle sezioni dei file
 
     private static int numThreads;
     private static String dirPath;

@@ -2,10 +2,7 @@ package ChatRoom;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.StandardSocketOptions;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
@@ -20,11 +17,12 @@ public class ChatRoom extends Thread {
         super();
         chatBox=box;
         user=username;
-        channel=DatagramChannel.open();
+        channel=DatagramChannel.open(StandardProtocolFamily.INET);
         System.setProperty("java.net.preferIPv4Stack", "true");
         NetworkInterface ni=NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
         channel.setOption(StandardSocketOptions.IP_MULTICAST_IF,ni);
         channel.setOption(StandardSocketOptions.SO_REUSEADDR,true);
+        channel.setOption(StandardSocketOptions.IP_MULTICAST_TTL,1);
         chatGroup=new InetSocketAddress(multicastGroup,port);
         InetAddress groupAddress=InetAddress.getByName(multicastGroup);
         channel.bind(new InetSocketAddress(port));

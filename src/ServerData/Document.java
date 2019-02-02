@@ -9,9 +9,6 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 import java.util.Vector;
 
@@ -33,7 +30,7 @@ import java.util.Vector;
 /*package*/ class Document implements Serializable {
 
 
-    private static final int maxSize=Integer.MAX_VALUE; //TODO:Impostare un valore massimo alle sezioni dei file
+    private static final int maxSize=Integer.MAX_VALUE;
     private String documentName;
     private String creator;
     private int numSection;
@@ -67,12 +64,10 @@ import java.util.Vector;
     /*package*/ void initialize(String path) throws IOException {
         Path dir=Paths.get(path,creator,documentName);
         Files.createDirectories(dir);
-        Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-------");
-        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
         for(int i=1;i<=numSection;i++){
             sectionPath[i-1]=dir.resolve("."+i);
             try{
-                Files.createFile(sectionPath[i-1],attr);
+                Files.createFile(sectionPath[i-1]);
             }
             catch (FileAlreadyExistsException e){
                 String empty="";
@@ -145,15 +140,15 @@ import java.util.Vector;
         }
         StringBuilder info=new StringBuilder();
         info.append("Section currently edited: ");
-        boolean allfree=true;
+        boolean allFree=true;
         for(int i=0;i<numSection;i++){
             if(currentEdited[i]!=null) {
-                allfree=false;
+                allFree=false;
                 info.append(i);
                 info.append("- ");
             }
         }
-        if(allfree) info.append("none");
+        if(allFree) info.append("none");
         ByteBuffer completeDocument=ByteBuffer.allocate(dimension);
         for(Path path:sectionPath){
             ByteBuffer section=openFile(path);

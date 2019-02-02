@@ -8,10 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Date;
 import java.util.Set;
 import java.util.Vector;
 
@@ -108,6 +104,7 @@ import java.util.Vector;
             String path=saveFile(arg1.getText(),"."+section,args.get(0));
             log="User started editing "+arg1.getText()+", section "+section;
             EditorForm editorForm=new EditorForm(main,arg1.getText(),section,Paths.get(path));
+            deleteText();
             editorForm.initialize();
             editorForm.open();
         }
@@ -165,9 +162,7 @@ import java.util.Vector;
             Files.write(dir,content,StandardOpenOption.TRUNCATE_EXISTING);
         }
         catch (NoSuchFileException e){
-            Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-------");
-            FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-            Files.createFile(dir,attr);
+            Files.createFile(dir);
             Files.write(dir,content,StandardOpenOption.TRUNCATE_EXISTING);
         }
         return dir.toString();

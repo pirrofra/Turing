@@ -75,6 +75,7 @@ import java.io.IOException;
     }
 
     private void addButtonListener(){
+        EnterListener listener=new EnterListener(login);
         JDialog me=this;
         login.addActionListener(new ActionListener() {
             @Override
@@ -121,6 +122,9 @@ import java.io.IOException;
 
             }
         });
+
+        username.addKeyListener(listener);
+        password.addKeyListener(listener);
 
     }
 

@@ -42,6 +42,9 @@ import java.text.NumberFormat;
         JPanel panel=initializeBody("New Document:",docName,"Number of Section:",numSection);
         panel.add(textAndLabel(" ",create));
         create.addActionListener(new ButtonHandler(Operation.CREATE,docName,numSection,main));
+        EnterListener listener=new EnterListener(create);
+        docName.addKeyListener(listener);
+        numSection.addKeyListener(listener);
         return panel;
     }
 
@@ -54,6 +57,8 @@ import java.text.NumberFormat;
         body.add(textAndLabel(" ",show));
         panel.add(body);
         show.addActionListener(new ButtonHandler(Operation.SHOW,docName,null,main));
+        EnterListener listener=new EnterListener(show);
+        docName.addKeyListener(listener);
         return panel;
     }
 
@@ -66,6 +71,9 @@ import java.text.NumberFormat;
         JPanel panel=initializeBody("Document Name",docName,"Section nr:",numSection);
         panel.add(textAndLabel(" ",show));
         show.addActionListener(new ButtonHandler(Operation.SHOW,docName,numSection,main));
+        EnterListener listener=new EnterListener(show);
+        docName.addKeyListener(listener);
+        numSection.addKeyListener(listener);
         return panel;
     }
 
@@ -76,8 +84,10 @@ import java.text.NumberFormat;
         JPanel panel=initializeBody("Document Name",docName,"User Invited",user);
         panel.add(textAndLabel(" ",invite));
         invite.addActionListener(new ButtonHandler(Operation.INVITE,docName,user,main));
+        EnterListener listener=new EnterListener(invite);
+        docName.addKeyListener(listener);
+        user.addKeyListener(listener);
         return panel;
-
     }
 
     private JPanel initializeEditDocumentPanel(){
@@ -89,6 +99,9 @@ import java.text.NumberFormat;
         JPanel panel=initializeBody("Document Name",docName,"Section nr:",numSection);
         panel.add(textAndLabel(" ",edit));
         edit.addActionListener(new ButtonHandler(Operation.EDIT,docName,numSection,main));
+        EnterListener listener=new EnterListener(edit);
+        docName.addKeyListener(listener);
+        numSection.addKeyListener(listener);
         return panel;
     }
 
