@@ -23,13 +23,15 @@ import java.io.IOException;
     private JLabel connectionStatus;
     private boolean loggedIn;
     private final MainForm main;
+    private final int UDPPort;
 
 
-    /*package*/ LogForm(MainForm father) {
+    /*package*/ LogForm(MainForm father,int port) {
         super(father,"Turing Client",true);
         executor=father.getExecutor();
         main=father;
         loggedIn=false;
+        UDPPort=port;
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
@@ -84,7 +86,7 @@ import java.io.IOException;
                 String pass=new String(password.getPassword());
                 ResultDialog dialog;
                 try{
-                    MessageBuffer result=executor.login(username.getText(),pass);
+                    MessageBuffer result=executor.login(username.getText(),pass,UDPPort);
                     if(result.getOP()==Operation.OK){
                         dialog=new ResultDialog(me,"Log in is successful!",false,true);
                         loggedIn=true;

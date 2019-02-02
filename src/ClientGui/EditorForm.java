@@ -136,7 +136,12 @@ import java.util.Vector;
             @Override
             public void actionPerformed(ActionEvent e) {
                 try{
-                    chat.sendMessage(mex.getText());
+                    String msg=mex.getText();
+                    if(msg.length()>1024){
+                        ResultDialog dialog=new ResultDialog(me,"Message is too long",false,false);
+                        dialog.show(400,100);
+                    }
+                    else chat.sendMessage(msg);
                 }
                 catch (IOException exception){
                     ResultDialog dialog=new ResultDialog(me,"Message couldn't be sent",false,false);

@@ -44,7 +44,7 @@ public class ChatRoom extends Thread {
             interrupt();
         }
         while(!Thread.interrupted()){
-            ByteBuffer buffer=ByteBuffer.allocate(2048);
+            ByteBuffer buffer=ByteBuffer.allocate(1024);
             try{
                 channel.receive(buffer);
                 buffer.flip();
@@ -68,6 +68,7 @@ public class ChatRoom extends Thread {
 
     public void sendMessage(String message) throws IOException{
         String msg="["+user+"]: "+message;
+        msg=msg.substring(0,Math.min(1024,msg.length()));
         byte[] buffer=msg.getBytes();
         send(ByteBuffer.wrap(buffer));
     }

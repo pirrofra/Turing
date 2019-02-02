@@ -45,7 +45,14 @@ public class TuringClient{
         exec=new RequestExecutor(channel,server,portRMI,dir);
         form=new MainForm(exec);
         form.initialize();
-        form.open();
+        try{
+            form.open();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
     }
 
     private static void setDefault(){

@@ -5,7 +5,10 @@ import Message.MessageBuffer;
 import Message.Operation;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Vector;
@@ -31,6 +34,7 @@ public class ServerExecutor implements Runnable {
     private final ConcurrentHashMap<SocketChannel,String> connectedUsers;
     private final BlockingQueue<SocketChannel> selectorKeys;
     private final Selector selector;
+    private final DatagramChannel channel;
 
     /**
      * Public class constructor
@@ -38,7 +42,7 @@ public class ServerExecutor implements Runnable {
      * @param sock Socket from where the request is happening
      * @param queue queue containing all sockets needed to be register for the selector, again
      */
-    public ServerExecutor(ServerData data, SocketChannel sock, BlockingQueue<SocketChannel> queue,Selector s){
+    public ServerExecutor(ServerData data, SocketChannel sock, BlockingQueue<SocketChannel> queue, Selector s, DatagramChannel c){
         users=data.getUserTable();
         documents=data.getDocumentTable();
         connectedUsers=data.getConnectedUsers();
@@ -46,6 +50,7 @@ public class ServerExecutor implements Runnable {
         socket=sock;
         selectorKeys=queue;
         selector=s;
+        channel=c;
     }
 
     /**
@@ -54,13 +59,17 @@ public class ServerExecutor implements Runnable {
      * @return reply message
      * @throws IllegalArgumentException if the message is incomplete or invalid
      */
-    private MessageBuffer login(Vector<byte[]> Args) throws IllegalArgumentException{
-       if(Args.size()!=2) throw new IllegalArgumentException();
-       String username=new String(Args.get(0));
-       String password=new String(Args.get(1));
-       Operation result=users.logIn(username,password);
-       if (result==Operation.OK) connectedUsers.put(socket,username);
-       return MessageBuffer.createMessageBuffer(result);
+    private MessageBuffer login(Vector<byte[]> Args) throws IllegalArgumentException,IOException{
+        if(Args.size()!=3) throw new IllegalArgumentException();
+        String username=new String(Args.get(0));
+        String password=new String(Args.get(1));
+        int port= ByteBuffer.wrap(Args.get(2)).getInt();
+        InetSocketAddress remoteSocketAddress=(InetSocketAddress) socket.getRemoteAddress();
+        InetAddress address=remoteSocketAddress.getAddress();
+        InetSocketAddress udpSocket=new InetSocketAddress(address,port);
+        Operation result=users.logIn(username,password,udpSocket);
+        if (result==Operation.OK) connectedUsers.put(socket,username);
+        return MessageBuffer.createMessageBuffer(result);
     }
 
     /**
@@ -93,7 +102,11 @@ public class ServerExecutor implements Runnable {
         Operation result;
         if(users.userExist(invited)) result=documents.invite(docName,user,invited);
         else result=Operation.USER_NOT_FOUND;
-        if(result==Operation.OK) users.addDocument(invited,docName);
+        if(result==Operation.OK) {
+            users.addDocument(invited,docName);
+            String msg=user +" has invited you to edit " +docName;
+            users.sendNotification(invited,msg,channel);
+        }
         return MessageBuffer.createMessageBuffer(result);
     }
 
@@ -200,6 +213,16 @@ public class ServerExecutor implements Runnable {
         }
     }
 
+    private void sendPendingNotification(String user){
+        try{
+            users.sendPendingNotifcation(user,channel);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
     /**
      * Method to correctly execute a request received form a socket using a MessageBuffer
      * @param msg MessageBuffer containing the request
@@ -263,6 +286,10 @@ public class ServerExecutor implements Runnable {
             MessageBuffer reply=execute(request);
             reply.sendMessage(socket);
             selectorKeys.put(socket);
+            if(request.getOP()==Operation.LOGIN) {
+                String user=connectedUsers.get(socket);
+                sendPendingNotification(user);
+            }
         }
         catch (IOException |InterruptedException e){
             logout();

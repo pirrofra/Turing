@@ -25,8 +25,10 @@ public RequestExecutor(SocketChannel socket,String hostname,int p,String path){
         filePath=path;
     }
 
-    /*package*/ synchronized MessageBuffer login(String username,String password) throws IOException{
-        MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.LOGIN,username.getBytes(),password.getBytes());
+    /*package*/ synchronized MessageBuffer login(String username,String password,int port) throws IOException{
+        ByteBuffer buffer=ByteBuffer.allocate(4);
+        buffer.putInt(port);
+        MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.LOGIN,username.getBytes(),password.getBytes(),buffer.array());
         request.sendMessage(channel);
         return MessageBuffer.readMessage(channel);
     }

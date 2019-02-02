@@ -2,7 +2,14 @@ package ServerData;
 
 import Message.Operation;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Vector;
 
 /**
@@ -23,6 +30,8 @@ import java.util.Vector;
     private Vector<String> documentList;
     private boolean loggedIn;
     private String editingDocument;
+    private InetSocketAddress client;
+    private int pendingNotification;
 
     /**
      * Class constructor
@@ -36,6 +45,8 @@ import java.util.Vector;
         password=psw;
         documentList=new Vector<>();
         editingDocument=null;
+        client=null;
+        pendingNotification=0;
     }
 
     /**
@@ -49,15 +60,17 @@ import java.util.Vector;
     /**
      * Method to notify user has logged in if password is correct
      * @param psw password for login
+     * @param address Address of the client the user is connected with
      * @return Message.Operation.Already_Logged_in if user is already logged in, Message.Operation.Password_incorrect if psw!=user.password
      *         Message.Operation.OK if login successful
      * @throws IllegalArgumentException if psw is null or an empty string
      */
-    /*package*/ synchronized Operation login(String psw) throws IllegalArgumentException{
+    /*package*/ synchronized Operation login(String psw, InetSocketAddress address) throws IllegalArgumentException{
         if (psw==null || psw.compareTo("")==0) throw new IllegalArgumentException();
         else if(loggedIn) return Operation.ALREADY_LOGGED_IN;
         else if(psw.compareTo(password)==0){
             loggedIn=true;
+            client=address;
             return Operation.OK;
         }
         else return Operation.PASSWORD_INCORRECT;
@@ -112,6 +125,31 @@ import java.util.Vector;
         loggedIn=false;
         String doc=editingDocument;
         editingDocument=null;
+        client=null;
         return doc;
     }
+
+    /*package*/ synchronized void notify(String msg, DatagramChannel channel){
+        if(!loggedIn) ++pendingNotification;
+        else{
+            msg=msg.substring(0,Math.min(msg.length(),1024));
+            ByteBuffer buffer=ByteBuffer.wrap(msg.getBytes());
+            try{
+                channel.send(buffer,client);
+            }
+            catch (IOException e){
+                ++pendingNotification;
+            }
+        }
+    }
+
+    /*package*/ synchronized void sendPendingNotification(DatagramChannel channel) throws IOException{
+        if(loggedIn && pendingNotification>0){
+            String msg="You had " + pendingNotification +" invite while you where away";
+            ByteBuffer buffer=ByteBuffer.wrap(msg.getBytes());
+            channel.send(buffer,client);
+            pendingNotification=0;
+        }
+    }
+
 }

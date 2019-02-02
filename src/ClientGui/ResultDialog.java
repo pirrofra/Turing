@@ -26,6 +26,7 @@ import java.awt.event.*;
         add(panel);
         panel.add(new JLabel(message), BorderLayout.CENTER);
         panel.add(ok,BorderLayout.SOUTH);
+        getRootPane().setDefaultButton(ok);
     }
 
     /*package*/ ResultDialog(Window f, Operation OP,boolean closeApp,boolean closeForm){

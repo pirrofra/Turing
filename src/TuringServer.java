@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -24,10 +21,10 @@ import java.util.concurrent.*;
  * This server uses Non-Blocking NIO Channels and a selector for TCP communication
  * When a socket is ready to be read, it's de-registered from the selector and it's given to a
  * FixedThreadPool where a thread will read his message, execute his request and send a reply
- * After the request is completed the channel is added in a blocking queue, where all channels who
+ * After the request is completed the notifcationChannel is added in a blocking queue, where all channels who
  * needs to be registered again in the selector are
  *
- * In this way one thread, and one thread only, can have access to the channel and no interference between read and write can happen
+ * In this way one thread, and one thread only, can have access to the notifcationChannel and no interference between read and write can happen
  *
  * This server reads a serverConfig.ini file to get its properties.
  * If no serverConfig.ini file is found or it's incomplete, default properties will be chosen
@@ -37,7 +34,6 @@ import java.util.concurrent.*;
 public class TuringServer {
 
     //TODO: pulizia di DirPath. ATTENZIONE che cancella ricorsivamente
-    //TODO: Notifica degli inviti! IMPORTANTISSIMO
     // TODO:Impostare un valore massimo alle sezioni dei file
 
 
@@ -47,6 +43,7 @@ public class TuringServer {
     private static int bound;
     private static int portRMI;
     private static int portTCP;
+    private static int UDPPort;
     private static int timeout;
     private static int portChat;
 
@@ -56,6 +53,7 @@ public class TuringServer {
     private static ThreadPoolExecutor pool;
     private static Properties config;
     private static final Properties defaultConfig=new Properties();
+    private static DatagramChannel notifcationChannel;
 
     /**
      * Server Main
@@ -69,6 +67,8 @@ public class TuringServer {
         try {
             setProperties();
             data=ServerData.createServerData(dirPath,baseAddress,bound,portChat,portRMI);
+            notifcationChannel =DatagramChannel.open();
+            notifcationChannel.socket().bind(new InetSocketAddress(UDPPort));
             dispatcher= openDispatcher();
             selector= Selector.open();
             dispatcher.register(selector, SelectionKey.OP_ACCEPT);
@@ -91,7 +91,7 @@ public class TuringServer {
    }
 
     /**
-     * Static Method that retrieves all channel in queue and register them to the selector again
+     * Static Method that retrieves all notifcationChannel in queue and register them to the selector again
      * @throws IOException if an error occurs during the registering process
      */
    private static void retrieveSocketChannels() throws IOException{
@@ -136,7 +136,7 @@ public class TuringServer {
    private static void readableKey(SelectionKey key)throws IOException{
         SocketChannel client=(SocketChannel) key.channel();
         key.cancel();
-        ServerExecutor thread=new ServerExecutor(data,client,queue,selector);
+        ServerExecutor thread=new ServerExecutor(data,client,queue,selector, notifcationChannel);
        System.out.println("New request received from "+client.getRemoteAddress().toString());
         pool.execute(thread);
    }
@@ -181,6 +181,7 @@ public class TuringServer {
        portRMI=getIntegerProperty("portRMI");
        timeout=getIntegerProperty("timeout");
        portChat=getIntegerProperty("portChat");
+       UDPPort=getIntegerProperty("portUDP");
 
    }
 
@@ -192,10 +193,12 @@ public class TuringServer {
        defaultConfig.setProperty("MulticastBaseAddress","239.0.0.0");
        defaultConfig.setProperty("MulticastBound","10000");
        defaultConfig.setProperty("numThreads","8");
+       defaultConfig.setProperty("portUDP","55433");
        defaultConfig.setProperty("portTCP","55432");
        defaultConfig.setProperty("portRMI","55431");
-       defaultConfig.setProperty("timeout","10000");
        defaultConfig.setProperty("portChat","56127");
+       defaultConfig.setProperty("timeout","10000");
+
    }
 
     /**

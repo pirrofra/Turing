@@ -9,7 +9,11 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.channels.DatagramChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
@@ -22,10 +26,13 @@ public class MainForm extends JFrame {
     private JButton updateList;
     private JButton logout;
     private JLabel connectionStatus;
+    private int UDPPort;
+    private NotificationListener thread;
 
     public MainForm(RequestExecutor exec){
         super("Turing Client");
         executor=exec;
+        thread=null;
     }
 
 
@@ -72,7 +79,7 @@ public class MainForm extends JFrame {
                 try{
                     MessageBuffer result=executor.logout();
                     if(result.getOP()==Operation.OK){
-                        LogForm logForm=new LogForm(mainForm);
+                        LogForm logForm=new LogForm(mainForm,UDPPort);
                         logForm.initialize();
                         logFromServer.setText("");
                         list.setText("");
@@ -147,12 +154,26 @@ public class MainForm extends JFrame {
         setPreferredSize(new Dimension(800,600));
     }
 
-    public void open(){
+    public void open() throws IOException{
         setVisible(true);
         pack();
-        LogForm login=new LogForm(this);
+        DatagramChannel channel=DatagramChannel.open();
+        channel.socket().bind(new InetSocketAddress(0));
+        UDPPort=channel.socket().getLocalPort();
+        LogForm login=new LogForm(this,UDPPort);
         login.initialize();
         login.setVisible(true);
+        if(thread==null){
+            thread=new NotificationListener(channel,this);
+            thread.start();
+        }
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                thread.interrupt();
+            }
+        });
     }
 
     /*package*/ RequestExecutor getExecutor(){

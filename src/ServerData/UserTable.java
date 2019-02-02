@@ -3,7 +3,11 @@ package ServerData;
 import Message.Operation;
 import RemoteUserTable.RemoteUserTable;
 
+import javax.xml.crypto.Data;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetSocketAddress;
+import java.nio.channels.DatagramChannel;
 import java.rmi.server.RemoteServer;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,17 +61,18 @@ import java.util.concurrent.ConcurrentHashMap;
      * Method for logging in
      * @param username username
      * @param password password
+     * @param address Address of the client the user is connected from
      * @return Message.Operation.User_Not_Found if username is not an existing user,
      *         Message.Operation.Already_Logged_in if user is already logged in,
      *         Message.Operation.Password_incorrect if the password is incorrect,
      *         Message.Operation.OK if login successful
      * @throws IllegalArgumentException if password and/or username are null
      */
-    /*package*/ Operation logIn(String username,String password) throws  IllegalArgumentException{
+    /*package*/ Operation logIn(String username, String password, InetSocketAddress address) throws  IllegalArgumentException{
         if(username==null) throw new IllegalArgumentException();
         User user=userMap.get(username);
         if(user==null) return Operation.USER_NOT_FOUND;
-        else return user.login(password);
+        else return user.login(password,address);
     }
 
     /**
@@ -133,6 +138,20 @@ import java.util.concurrent.ConcurrentHashMap;
             if(user!=null) return user.logoff();
         }
         return null;
+    }
+
+    /*package*/ void sendNotification(String username, String msg, DatagramChannel channel){
+        if(username!=null){
+            User user=userMap.get(username);
+            if(user!=null) user.notify(msg,channel);
+        }
+    }
+
+    /*package*/ void sendPendingNotifcation(String username,DatagramChannel channel) throws IOException {
+        if(username!=null){
+            User user=userMap.get(username);
+            if(user!=null) user.sendPendingNotification(channel);
+        }
     }
 
     /*package*/ boolean userExist(String username){
