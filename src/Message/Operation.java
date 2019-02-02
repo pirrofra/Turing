@@ -34,7 +34,8 @@ public enum Operation {
     FILE_TOO_BIG(-12),
     REQUEST_INCOMPLETE(-13),
     CLIENT_NOT_LOGGED_IN(-14),
-    INVALID_REQUEST(-15);
+    INVALID_REQUEST(-15),
+    INVALID_CHARACTERS(-16);
     // --- RESPONSE --- //
 
     int value;
@@ -114,6 +115,9 @@ public enum Operation {
                 break;
             case INVALID_REQUEST:
                 result=  "An invalid request was sent to the server";
+                break;
+            case INVALID_CHARACTERS:
+                result= "Don't use any whitespaces, slash or backslash";
                 break;
             default:
                 result=  "An invalid response was sent by the server";

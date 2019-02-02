@@ -58,6 +58,7 @@ import java.util.concurrent.ConcurrentHashMap;
      */
     /*package*/ Operation createDocument(String name, String creator, int numSections) throws IllegalArgumentException{
         Document newDoc=Document.createDocument(name,creator,numSections);
+        if(name.contains("\\")||name.contains("/")||name.contains(" ")) return Operation.INVALID_CHARACTERS;
         if(docMap.putIfAbsent(creator+"/"+name,newDoc)==null) {
             try{
                 newDoc.initialize(docPath);

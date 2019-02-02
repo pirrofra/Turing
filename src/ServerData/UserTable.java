@@ -48,6 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
      */
     public Operation registerUser(String username, String password) throws IllegalArgumentException {
         User newUser=new User(username,password);
+        if(username.contains("\\")||username.contains("/")||username.contains(" ")) return Operation.INVALID_CHARACTERS;
         if(userMap.putIfAbsent(username,newUser)==null) return Operation.OK;
         else return Operation.NAME_NOT_AVAILABLE;
     }

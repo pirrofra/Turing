@@ -143,14 +143,23 @@ public class ServerExecutor implements Runnable {
         int section=ByteBuffer.wrap(Args.get(1)).getInt();
         Operation result=users.edit(user,docName);
         MessageBuffer message;
+        boolean resetEdit=false;
         if(result==Operation.OK) {
-            message= documents.edit(docName,user,section);
-            if(message.getOP()!=Operation.OK) users.endEdit(user);
+            try{
+                message= documents.edit(docName,user,section);
+                if(message.getOP()!=Operation.OK) resetEdit=true;
+            }
+            catch (IllegalArgumentException e){
+                resetEdit=true;
+                message= MessageBuffer.createMessageBuffer(Operation.FAIL);
+            }
+
         }
         else{
-            if(result!=Operation.USER_ALREADY_EDITING) users.endEdit(user);
+            if(result!=Operation.USER_ALREADY_EDITING) resetEdit=true;
             message= MessageBuffer.createMessageBuffer(result);
         }
+        if(resetEdit) users.endEdit(user);
         return message;
     }
 

@@ -144,7 +144,7 @@ import java.util.Vector;
         for(int i=0;i<numSection;i++){
             if(currentEdited[i]!=null) {
                 allFree=false;
-                info.append(i);
+                info.append(i+1);
                 info.append("- ");
             }
         }
@@ -225,17 +225,15 @@ import java.util.Vector;
         builder.append(creator);
         builder.append("/");
         builder.append(documentName);
-        builder.append("\n");
-        builder.append("    Creator: ");
+        builder.append("\n    Creator: ");
         builder.append(creator);
-        builder.append("\n");
-        builder.append("    Invited User: ");
+        builder.append("\n    Invited User: ");
+
         for(String user:userInvited){
             if(user.compareTo(creator)!=0)builder.append(user);
-            builder.append(" ");
+            builder.append(" - ");
         }
-        builder.append("\n");
-        builder.append("    Number of Section: ");
+        builder.append("\n    Number of Section: ");
         builder.append(numSection);
         builder.append("\n");
         return builder.toString();
