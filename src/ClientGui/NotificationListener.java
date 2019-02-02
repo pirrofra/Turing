@@ -6,8 +6,8 @@ import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.DatagramChannel;
 
 /*package*/ class NotificationListener extends Thread {
-    private DatagramChannel channel;
-    private MainForm main;
+    private final DatagramChannel channel;
+    private final MainForm main;
 
     /*package*/ NotificationListener(DatagramChannel c, MainForm m){
         super();

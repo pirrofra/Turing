@@ -6,7 +6,7 @@ import java.awt.event.KeyListener;
 
 /*package*/ class EnterListener implements KeyListener {
 
-    private JButton button;
+    private final JButton button;
 
     /*package*/ EnterListener(JButton b){
         button=b;

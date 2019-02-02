@@ -3,7 +3,6 @@ package ServerData;
 import Message.Operation;
 import RemoteUserTable.RemoteUserTable;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
@@ -147,7 +146,7 @@ import java.util.concurrent.ConcurrentHashMap;
         }
     }
 
-    /*package*/ void sendPendingNotifcation(String username,DatagramChannel channel) throws IOException {
+    /*package*/ void sendPendingNotification(String username, DatagramChannel channel) throws IOException {
         if(username!=null){
             User user=userMap.get(username);
             if(user!=null) user.sendPendingNotification(channel);

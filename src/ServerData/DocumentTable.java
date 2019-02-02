@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
     /**
      * Class Constructor with no parameter for ConcurrentHashMap
      * @param path path where to store all documents' sections
+     * @param max maximum size for a document
      */
     /*package*/ DocumentTable(String path,int max){
         docMap=new ConcurrentHashMap<>();
@@ -38,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
     /**
      * Class constructor
      * @param path path where to store all document's sections
+     * @param max document maximum size
      * @param initialCapacity hash map initial capacity
      * @param loadFactor hash map load factor
      * @param concurrencyLevel number of max concurrent access in docMap
@@ -120,6 +122,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * @param user user who sent the request
      * @param section section modified
      * @param file byte array containing updated section
+     * @param chat ChatOrganizer used for generating multicast address
      * @return Message.Operation.Document_Not_Found if the user has not been invited to edit document or if document doesn't exist
      *         Message.Operation.Editing_Not_Request if the user didn't make an edit request first
      *         Message.Operation.Fail if an I/O error occurs
@@ -202,6 +205,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * Method to notify the user has stopped editing without saving any content
      * @param document document stopped to be edited
      * @param username username who stopped editing
+     * @param chat ChatOrganizer used for generating multicast address
      */
     /*package*/ void abruptStop(String document, String username, ChatOrganizer chat){
         if(document!=null){

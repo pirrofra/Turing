@@ -43,6 +43,7 @@ import java.util.Vector;
      * @param docName document name
      * @param userCreator user who created the document
      * @param sections number of sections of the document
+     * @param maxSize maximum dimension of a document
      * @throws IllegalArgumentException if docName and/or userCreator are null and if sections in 0 or less
      */
     private Document(String docName,String userCreator, int sections ,int maxSize) throws IllegalArgumentException{
@@ -82,6 +83,7 @@ import java.util.Vector;
      * @param docName ServerData.Document name
      * @param userCreator user who created the document
      * @param sections number of sections
+     * @param maxSize maximum dimension of a document
      * @return new ServerData.Document
      * @throws IllegalArgumentException if docName and/or userCreator are null and if sections in 0 or less
      */
@@ -182,6 +184,7 @@ import java.util.Vector;
      * @param section section wanted to be edited
      * @param username user who requested the end edit
      * @param file  content of the file to be saved
+     * @param chat ChatOrganizer used for generating multicast address
      * @return Message.Operation.Document_Not_Found if the user has not been invited
      *         Message.Operation.Editing_Not_Requested if the user has not requested an editing of this section
      *         Message.Operation.OK if successful
@@ -244,6 +247,7 @@ import java.util.Vector;
     /**
      * Method to notify the user has stopped editing without saving any content
      * @param user user who stopped editing
+     * @param chat ChatOrganizer used for generating multicast address
      */
     /*package*/ synchronized void abruptStop(String user,ChatOrganizer chat){
         if(user!=null){

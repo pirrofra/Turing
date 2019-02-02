@@ -41,6 +41,8 @@ public class ServerExecutor implements Runnable {
      * @param data ServerData containing all server information
      * @param sock Socket from where the request is happening
      * @param queue queue containing all sockets needed to be register for the selector, again
+     * @param s Selector to wakeup when request is completed
+     * @param c DatagramChannel used to send notifications
      */
     public ServerExecutor(ServerData data, SocketChannel sock, BlockingQueue<SocketChannel> queue, Selector s, DatagramChannel c){
         users=data.getUserTable();
@@ -58,6 +60,7 @@ public class ServerExecutor implements Runnable {
      * @param Args Message arguments
      * @return reply message
      * @throws IllegalArgumentException if the message is incomplete or invalid
+     * @throws IOException if it fails to open the DatagramSocket
      */
     private MessageBuffer login(Vector<byte[]> Args) throws IllegalArgumentException,IOException{
         if(Args.size()!=3) throw new IllegalArgumentException();
@@ -215,7 +218,7 @@ public class ServerExecutor implements Runnable {
 
     private void sendPendingNotification(String user){
         try{
-            users.sendPendingNotifcation(user,channel);
+            users.sendPendingNotification(user,channel);
         }
         catch (IOException e){
             e.printStackTrace();

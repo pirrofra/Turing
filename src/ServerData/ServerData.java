@@ -3,10 +3,8 @@ package ServerData;
 import ChatRoom.ChatOrganizer;
 import RemoteUserTable.RemoteUserTable;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.nio.channels.SocketChannel;
-import java.nio.file.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -34,6 +32,10 @@ public class ServerData implements Serializable {
     /**
      * Private class constructor
      * @param path Path to use for storing documents
+     * @param baseAddress address base for multicast range
+     * @param bound Multicast address range dimension
+     * @param port port used for the Multicast Chat
+     * @param maxSize max Dimension of a document
      */
     private ServerData(String path,String baseAddress,int bound,int port,int maxSize) {
         users=new UserTable();
@@ -45,6 +47,10 @@ public class ServerData implements Serializable {
     /**
      * Private class constructor
      * @param path Path to use for storing documents
+     * @param maxSize max Dimension of a document
+     * @param baseAddress address base for multicast range
+     * @param bound Multicast address range dimension
+     * @param port port used for the Multicast Chat
      * @param initialCapacity hashTable initial capacity
      * @param loadFactor Hash Table load factor
      * @param concurrencyLevel max number of concurrent access
@@ -99,6 +105,10 @@ public class ServerData implements Serializable {
     /**
      * Static method used to retrieve a new ServerData instance
      * @param path Path to use for storing documents
+     * @param maxSize max Dimension of a document
+     * @param baseAddress address base for multicast range
+     * @param bound Multicast address range dimension
+     * @param chatPort Port used for the Multicast Chat
      * @param RMIport port to use for the RMI registry
      * @return new ServerData instance
      * @throws RemoteException an exception thrown by the RMI-support if an error occurs

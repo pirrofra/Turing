@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Set;
 import java.util.Vector;
 
 /*package*/ class ButtonHandler implements ActionListener {
