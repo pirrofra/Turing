@@ -6,6 +6,7 @@ import Message.Operation;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
@@ -29,6 +30,7 @@ public class ServerExecutor implements Runnable {
     private final SocketChannel socket;
     private final ConcurrentHashMap<SocketChannel,String> connectedUsers;
     private final BlockingQueue<SocketChannel> selectorKeys;
+    private final Selector selector;
 
     /**
      * Public class constructor
@@ -36,13 +38,14 @@ public class ServerExecutor implements Runnable {
      * @param sock Socket from where the request is happening
      * @param queue queue containing all sockets needed to be register for the selector, again
      */
-    public ServerExecutor(ServerData data, SocketChannel sock, BlockingQueue<SocketChannel> queue){
+    public ServerExecutor(ServerData data, SocketChannel sock, BlockingQueue<SocketChannel> queue,Selector s){
         users=data.getUserTable();
         documents=data.getDocumentTable();
         connectedUsers=data.getConnectedUsers();
         chat=data.getChatOrganizer();
         socket=sock;
         selectorKeys=queue;
+        selector=s;
     }
 
     /**
@@ -270,6 +273,7 @@ public class ServerExecutor implements Runnable {
                 e1.printStackTrace();
             }
         }
+        selector.wakeup();
 
     }
 }

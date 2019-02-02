@@ -136,7 +136,7 @@ public class TuringServer {
    private static void readableKey(SelectionKey key)throws IOException{
         SocketChannel client=(SocketChannel) key.channel();
         key.cancel();
-        ServerExecutor thread=new ServerExecutor(data,client,queue);
+        ServerExecutor thread=new ServerExecutor(data,client,queue,selector);
        System.out.println("New request received from "+client.getRemoteAddress().toString());
         pool.execute(thread);
    }
@@ -194,7 +194,7 @@ public class TuringServer {
        defaultConfig.setProperty("numThreads","8");
        defaultConfig.setProperty("portTCP","55432");
        defaultConfig.setProperty("portRMI","55431");
-       defaultConfig.setProperty("timeout","1000");
+       defaultConfig.setProperty("timeout","10000");
        defaultConfig.setProperty("portChat","56127");
    }
 
