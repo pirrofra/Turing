@@ -23,14 +23,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
     private final ConcurrentHashMap<String,Document> docMap;
     private final String docPath;
+    private final int maxSize;
 
     /**
      * Class Constructor with no parameter for ConcurrentHashMap
      * @param path path where to store all documents' sections
      */
-    /*package*/ DocumentTable(String path){
+    /*package*/ DocumentTable(String path,int max){
         docMap=new ConcurrentHashMap<>();
         docPath=path;
+        maxSize=max;
     }
 
     /**
@@ -40,9 +42,10 @@ import java.util.concurrent.ConcurrentHashMap;
      * @param loadFactor hash map load factor
      * @param concurrencyLevel number of max concurrent access in docMap
      */
-    /*package*/ DocumentTable(String path, int initialCapacity, float loadFactor, int concurrencyLevel){
+    /*package*/ DocumentTable(String path,int max, int initialCapacity, float loadFactor, int concurrencyLevel){
         docMap=new ConcurrentHashMap<>(initialCapacity,loadFactor,concurrencyLevel);
         docPath=path;
+        maxSize=max;
     }
 
     /**
@@ -57,7 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * @throws IllegalArgumentException if name and/or creator are null or numSections is zero or less
      */
     /*package*/ Operation createDocument(String name, String creator, int numSections) throws IllegalArgumentException{
-        Document newDoc=Document.createDocument(name,creator,numSections);
+        Document newDoc=Document.createDocument(name,creator,numSections,maxSize);
         if(name.contains("\\")||name.contains("/")||name.contains(" ")) return Operation.INVALID_CHARACTERS;
         if(docMap.putIfAbsent(creator+"/"+name,newDoc)==null) {
             try{

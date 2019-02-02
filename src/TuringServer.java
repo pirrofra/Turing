@@ -9,10 +9,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.*;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Vector;
+import java.nio.file.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -21,10 +19,10 @@ import java.util.concurrent.*;
  * This server uses Non-Blocking NIO Channels and a selector for TCP communication
  * When a socket is ready to be read, it's de-registered from the selector and it's given to a
  * FixedThreadPool where a thread will read his message, execute his request and send a reply
- * After the request is completed the notifcationChannel is added in a blocking queue, where all channels who
+ * After the request is completed the notificationChannel is added in a blocking queue, where all channels who
  * needs to be registered again in the selector are
  *
- * In this way one thread, and one thread only, can have access to the notifcationChannel and no interference between read and write can happen
+ * In this way one thread, and one thread only, can have access to the notificationChannel and no interference between read and write can happen
  *
  * This server reads a serverConfig.ini file to get its properties.
  * If no serverConfig.ini file is found or it's incomplete, default properties will be chosen
@@ -33,10 +31,7 @@ import java.util.concurrent.*;
  */
 public class TuringServer {
 
-    //TODO: pulizia di DirPath. ATTENZIONE che cancella ricorsivamente
-    // TODO:Impostare un valore massimo alle sezioni dei file
-
-
+    private static final double max=Integer.MAX_VALUE*0.9;
     private static int numThreads;
     private static String dirPath;
     private static String baseAddress;
@@ -46,6 +41,7 @@ public class TuringServer {
     private static int UDPPort;
     private static int timeout;
     private static int portChat;
+    private static int documentSize;
 
     private static ServerData data;
     private static Selector selector=null;
@@ -53,7 +49,7 @@ public class TuringServer {
     private static ThreadPoolExecutor pool;
     private static Properties config;
     private static final Properties defaultConfig=new Properties();
-    private static DatagramChannel notifcationChannel;
+    private static DatagramChannel notificationChannel;
 
     /**
      * Server Main
@@ -66,9 +62,10 @@ public class TuringServer {
         config=new Properties(defaultConfig);
         try {
             setProperties();
-            data=ServerData.createServerData(dirPath,baseAddress,bound,portChat,portRMI);
-            notifcationChannel =DatagramChannel.open();
-            notifcationChannel.socket().bind(new InetSocketAddress(UDPPort));
+            clear();
+            data=ServerData.createServerData(dirPath,documentSize,baseAddress,bound,portChat,portRMI);
+            notificationChannel =DatagramChannel.open();
+            notificationChannel.socket().bind(new InetSocketAddress(UDPPort));
             dispatcher= openDispatcher();
             selector= Selector.open();
             dispatcher.register(selector, SelectionKey.OP_ACCEPT);
@@ -91,7 +88,7 @@ public class TuringServer {
    }
 
     /**
-     * Static Method that retrieves all notifcationChannel in queue and register them to the selector again
+     * Static Method that retrieves all notificationChannel in queue and register them to the selector again
      * @throws IOException if an error occurs during the registering process
      */
    private static void retrieveSocketChannels() throws IOException{
@@ -136,7 +133,7 @@ public class TuringServer {
    private static void readableKey(SelectionKey key)throws IOException{
         SocketChannel client=(SocketChannel) key.channel();
         key.cancel();
-        ServerExecutor thread=new ServerExecutor(data,client,queue,selector, notifcationChannel);
+        ServerExecutor thread=new ServerExecutor(data,client,queue,selector, notificationChannel);
        System.out.println("New request received from "+client.getRemoteAddress().toString());
         pool.execute(thread);
    }
@@ -174,15 +171,16 @@ public class TuringServer {
             output.close();
         }
        dirPath=config.getProperty("dirPath");
-       baseAddress=config.getProperty("MulticastBaseAddress");
-       bound=getIntegerProperty("MulticastBound");
+       baseAddress=config.getProperty("multicastBaseAddress");
+       bound=getIntegerProperty("multicastBound");
        numThreads=getIntegerProperty("numThreads");
        portTCP=getIntegerProperty("portTCP");
        portRMI=getIntegerProperty("portRMI");
        timeout=getIntegerProperty("timeout");
        portChat=getIntegerProperty("portChat");
        UDPPort=getIntegerProperty("portUDP");
-
+       documentSize=getIntegerProperty("documentSize");
+       if(documentSize>max||documentSize<1023) documentSize=(int) max;
    }
 
     /**
@@ -190,15 +188,15 @@ public class TuringServer {
      */
    private static void setDefault(){
        defaultConfig.setProperty("dirPath","files/");
-       defaultConfig.setProperty("MulticastBaseAddress","239.0.0.0");
-       defaultConfig.setProperty("MulticastBound","10000");
+       defaultConfig.setProperty("multicastBaseAddress","239.0.0.0");
+       defaultConfig.setProperty("multicastBound","10000");
        defaultConfig.setProperty("numThreads","8");
        defaultConfig.setProperty("portUDP","55433");
        defaultConfig.setProperty("portTCP","55432");
        defaultConfig.setProperty("portRMI","55431");
        defaultConfig.setProperty("portChat","56127");
        defaultConfig.setProperty("timeout","10000");
-
+       defaultConfig.setProperty("documentSize",Integer.toString((int)max));
    }
 
     /**
@@ -214,5 +212,30 @@ public class TuringServer {
            return Integer.parseInt(defaultConfig.getProperty(key));
        }
    }
+
+
+   private static void clear()throws IOException{
+       Scanner in=new Scanner(System.in);
+       System.out.println("Attention, the entire content of "+dirPath +" is going to be deleted.\nPress Y to continue");
+       char c=in.next().charAt(0);
+       if(c!='y'&& c!='Y'){
+           System.out.println("Aborting operation");
+           System.exit(-1);
+       }
+       deleteDir(Paths.get(dirPath));
+   }
+
+
+    private static void deleteDir(Path path) throws IOException{
+        if(Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)){
+            DirectoryStream<Path> files=Files.newDirectoryStream(path);
+            for(Path entry:files){
+                deleteDir(entry);
+            }
+        }
+        if(Files.exists(path))
+            Files.delete(path);
+
+    }
 
 }

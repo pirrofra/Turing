@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
-import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -30,7 +29,7 @@ import java.util.Vector;
 /*package*/ class Document implements Serializable {
 
 
-    private static final int maxSize=Integer.MAX_VALUE;
+    private final int sectionSize;
     private String documentName;
     private String creator;
     private int numSection;
@@ -46,7 +45,7 @@ import java.util.Vector;
      * @param sections number of sections of the document
      * @throws IllegalArgumentException if docName and/or userCreator are null and if sections in 0 or less
      */
-    private Document(String docName,String userCreator, int sections ) throws IllegalArgumentException{
+    private Document(String docName,String userCreator, int sections ,int maxSize) throws IllegalArgumentException{
         if(docName==null||docName.compareTo("")==0||userCreator==null||sections<1) throw new IllegalArgumentException();
         documentName=docName;
         creator=userCreator;
@@ -54,6 +53,7 @@ import java.util.Vector;
         sectionPath=new Path[sections];
         currentEdited=new String[sections];
         userInvited=new Vector<>();
+        sectionSize=maxSize/sections;
     }
 
     /**
@@ -85,8 +85,8 @@ import java.util.Vector;
      * @return new ServerData.Document
      * @throws IllegalArgumentException if docName and/or userCreator are null and if sections in 0 or less
      */
-    /*package*/ static Document createDocument(String docName,String userCreator,int sections) throws IllegalArgumentException {
-        Document newDoc=new Document(docName,userCreator,sections);
+    /*package*/ static Document createDocument(String docName,String userCreator,int sections,int maxSize) throws IllegalArgumentException {
+        Document newDoc=new Document(docName,userCreator,sections,maxSize);
         newDoc.addUser(userCreator);
         return newDoc;
     }
@@ -192,7 +192,7 @@ import java.util.Vector;
         if(section>numSection||section<1) throw new IllegalArgumentException();
         else if(!userInvited.contains(username)) return Operation.DOCUMENT_NOT_FOUND;
         else if(currentEdited[section-1]==null||currentEdited[section-1].compareTo(username)!=0) return Operation.EDITING_NOT_REQUESTED;
-        else if(file.length>maxSize/numSection) return Operation.FILE_TOO_BIG;
+        else if(file.length>sectionSize) return Operation.FILE_TOO_BIG;
         else{
             saveFile(sectionPath[section-1],file);
             currentEdited[section-1]=null;
@@ -235,7 +235,9 @@ import java.util.Vector;
         }
         builder.append("\n    Number of Section: ");
         builder.append(numSection);
-        builder.append("\n");
+        builder.append("\n    Each section has a maximum dimension of ");
+        builder.append(sectionSize);
+        builder.append(" bytes\n");
         return builder.toString();
     }
 

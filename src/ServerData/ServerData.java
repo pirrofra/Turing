@@ -35,9 +35,9 @@ public class ServerData implements Serializable {
      * Private class constructor
      * @param path Path to use for storing documents
      */
-    private ServerData(String path,String baseAddress,int bound,int port) {
+    private ServerData(String path,String baseAddress,int bound,int port,int maxSize) {
         users=new UserTable();
-        documents=new DocumentTable(path);
+        documents=new DocumentTable(path,maxSize);
         connectedUsers=new ConcurrentHashMap<>();
         chat=new ChatOrganizer(baseAddress,bound,port);
     }
@@ -49,9 +49,9 @@ public class ServerData implements Serializable {
      * @param loadFactor Hash Table load factor
      * @param concurrencyLevel max number of concurrent access
      */
-    private ServerData(String path,String baseAddress,int bound,int port, int initialCapacity, float loadFactor, int concurrencyLevel) {
+    private ServerData(String path,int maxSize,String baseAddress,int bound,int port, int initialCapacity, float loadFactor, int concurrencyLevel) {
         users=new UserTable(initialCapacity,loadFactor,concurrencyLevel);
-        documents=new DocumentTable(path,initialCapacity,loadFactor,concurrencyLevel);
+        documents=new DocumentTable(path,maxSize,initialCapacity,loadFactor,concurrencyLevel);
         connectedUsers=new ConcurrentHashMap<>();
         chat=new ChatOrganizer(baseAddress,bound,port);
     }
@@ -103,24 +103,13 @@ public class ServerData implements Serializable {
      * @return new ServerData instance
      * @throws RemoteException an exception thrown by the RMI-support if an error occurs
      */
-    public static ServerData createServerData(String path,String baseAddress,int bound,int chatPort,int RMIport) throws IOException{
-        ServerData newData=new ServerData(path,baseAddress,bound,chatPort);
+    public static ServerData createServerData(String path,int maxSize,String baseAddress,int bound,int chatPort,int RMIport) throws RemoteException{
+        ServerData newData=new ServerData(path,baseAddress,bound,chatPort,maxSize);
         newData.activateRMI(RMIport);
-        deleteDir(Paths.get(path));
         return newData;
     }
 
-    private static void deleteDir(Path path) throws IOException{
-        if(Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)){
-            DirectoryStream<Path> files=Files.newDirectoryStream(path);
-            for(Path entry:files){
-                deleteDir(entry);
-            }
-        }
-        if(Files.exists(path))
-            Files.delete(path);
 
-    }
 
 
 }
