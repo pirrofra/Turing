@@ -36,9 +36,7 @@ import java.text.NumberFormat;
     private JPanel initializeCreatePanel(){
         JButton create=new JButton("Create");
         JTextField docName=new JTextField();
-        NumberFormat format=NumberFormat.getIntegerInstance();
-        format.setMaximumFractionDigits(0);
-        JFormattedTextField numSection=new JFormattedTextField(format);
+        JTextField numSection=new JTextField();
         JPanel panel=initializeBody("New Document:",docName,"Number of Section:",numSection);
         panel.add(textAndLabel(" ",create));
         create.addActionListener(new ButtonHandler(Operation.CREATE,docName,numSection,main));
@@ -65,9 +63,7 @@ import java.text.NumberFormat;
     private JPanel initializeShowSectionPanel(){
         JButton show=new JButton("Show");
         JTextField docName=new JTextField();
-        NumberFormat format=NumberFormat.getIntegerInstance();
-        format.setMaximumFractionDigits(0);
-        JFormattedTextField numSection=new JFormattedTextField(format);
+        JTextField numSection=new JTextField();
         JPanel panel=initializeBody("Document Name",docName,"Section nr:",numSection);
         panel.add(textAndLabel(" ",show));
         show.addActionListener(new ButtonHandler(Operation.SHOW,docName,numSection,main));
@@ -93,9 +89,7 @@ import java.text.NumberFormat;
     private JPanel initializeEditDocumentPanel(){
         JButton edit=new JButton("Edit");
         JTextField docName=new JTextField();
-        NumberFormat format=NumberFormat.getIntegerInstance();
-        format.setMaximumFractionDigits(0);
-        JFormattedTextField numSection=new JFormattedTextField(format);
+        JTextField numSection=new JTextField();
         JPanel panel=initializeBody("Document Name",docName,"Section nr:",numSection);
         panel.add(textAndLabel(" ",edit));
         edit.addActionListener(new ButtonHandler(Operation.EDIT,docName,numSection,main));
