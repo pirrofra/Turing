@@ -20,14 +20,41 @@ import java.util.Vector;
  *
  * @author Francesco Pirrò - Matr. 544539
  */
-/*package*/ class User implements Serializable {
+/*package*/ class User {
 
+    /**
+     * Username of the user
+     */
     private String username;
+
+    /**
+     * password of the user
+     */
     private String password;
+
+    /**
+     * List of document the user can edit
+     */
     private Vector<String> documentList;
+
+    /**
+     * boolean that keeps track if the user is logged in or not
+     */
     private boolean loggedIn;
+
+    /**
+     * Document the user is currently editing, null if he's not editing anything
+     */
     private String editingDocument;
+
+    /**
+     * SocketAddress for sending notification to
+     */
     private InetSocketAddress client;
+
+    /**
+     * number of pending notification
+     */
     private int pendingNotification;
 
     /**
@@ -126,6 +153,11 @@ import java.util.Vector;
         return doc;
     }
 
+    /**
+     * Method that notify an user if an invite has been received, or it increments the number of pending notification
+     * @param msg message to be sent as a notification
+     * @param channel channel used for the communication
+     */
     /*package*/ synchronized void notify(String msg, DatagramChannel channel){
         if(!loggedIn) ++pendingNotification;
         else{
@@ -140,6 +172,11 @@ import java.util.Vector;
         }
     }
 
+    /**
+     * Method that sends all pending notification to an user if the number of pending notification in more than 0
+     * @param channel used for the communication
+     * @throws IOException if an error occurs while sending pending notification
+     */
     /*package*/ synchronized void sendPendingNotification(DatagramChannel channel) throws IOException{
         if(loggedIn && pendingNotification>0){
             String msg="You had " + pendingNotification +" invite while you where away";

@@ -23,10 +23,25 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Francesco Pirrò - Matr.544539
  */
-public class ServerData implements Serializable {
+public class ServerData {
+    /**
+     * Registered user
+     */
     private final UserTable users;
+
+    /**
+     * Existing documents
+     */
     private final DocumentTable documents;
+
+    /**
+     * ChatOrganizer to keep track of free and used multicast address
+     */
     private final ChatOrganizer chat;
+
+    /**
+     * Connected Users
+     */
     private final ConcurrentHashMap<SocketChannel,String> connectedUsers;
 
     /**
@@ -118,8 +133,5 @@ public class ServerData implements Serializable {
         newData.activateRMI(RMIport);
         return newData;
     }
-
-
-
 
 }

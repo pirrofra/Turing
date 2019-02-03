@@ -19,10 +19,21 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Francesco Pirrò - Matr. 544539
  */
-/*package*/ class DocumentTable implements Serializable {
+/*package*/ class DocumentTable {
 
+    /**
+     * HashMap that maps Document's name and Document instances that keeps track of document's info
+     */
     private final ConcurrentHashMap<String,Document> docMap;
+
+    /**
+     * Path where document are stored
+     */
     private final String docPath;
+
+    /**
+     * maximum size of a document. At the time of creation this size is divided equally between each section
+     */
     private final int maxSize;
 
     /**
@@ -216,6 +227,14 @@ import java.util.concurrent.ConcurrentHashMap;
         }
     }
 
+    /**
+     * Method to get the Room Address of a document, if chatAddress is null it generates a new address with a ChatOrganizer
+     * @param document document editing session
+     * @param username user who wants to join the chat
+     * @param chat ChatOrganizer that keeps track of free and used multicast address
+     * @return MessageBuffer containing the result
+     * @throws IllegalArgumentException if username or document are null
+     */
     /*package*/ MessageBuffer getChatAddress(String document, String username,ChatOrganizer chat) throws IllegalArgumentException{
         if(document==null) throw new IllegalArgumentException();
         Document doc=docMap.get(document);

@@ -21,8 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Francesco Pirrò - Matr. 544539
  */
-/*package*/ class UserTable extends RemoteServer implements RemoteUserTable, Serializable {
+/*package*/ class UserTable extends RemoteServer implements RemoteUserTable {
 
+    /**
+     * Map of Username and instances of User class
+     */
     private final ConcurrentHashMap<String,User> userMap;
 
     /**
@@ -139,6 +142,12 @@ import java.util.concurrent.ConcurrentHashMap;
         return null;
     }
 
+    /**
+     * Method that send a Notification to an user
+     * @param username user to send a notification to
+     * @param msg message to be sent as a notification
+     * @param channel channel used for communication
+     */
     /*package*/ void sendNotification(String username, String msg, DatagramChannel channel){
         if(username!=null){
             User user=userMap.get(username);
@@ -146,6 +155,12 @@ import java.util.concurrent.ConcurrentHashMap;
         }
     }
 
+    /**
+     * Method that send pending Notification to an user
+     * @param username user to send notification to
+     * @param channel channel used for communications
+     * @throws IOException if an error occurs while sending pending notifications
+     */
     /*package*/ void sendPendingNotification(String username, DatagramChannel channel) throws IOException {
         if(username!=null){
             User user=userMap.get(username);
@@ -153,6 +168,11 @@ import java.util.concurrent.ConcurrentHashMap;
         }
     }
 
+    /**
+     * Method that check if an user exist
+     * @param username username to be checked
+     * @return true if it exist, false otherwise
+     */
     /*package*/ boolean userExist(String username){
         return userMap.containsKey(username);
     }

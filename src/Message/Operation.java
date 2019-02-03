@@ -65,6 +65,11 @@ public enum Operation {
         return map.get(v);
     }
 
+    /**
+     * Get the description based on Operation
+     * @param OP Operation to be described
+     * @return string containing a description
+     */
     public static String getDescription(Operation OP){
         String result;
         switch (OP){

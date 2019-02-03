@@ -5,14 +5,29 @@ import Message.Operation;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.text.NumberFormat;
 
+/**
+ * This class extends a JPanel and gives the user a graphical interface that let him choose between different request to be sent to the server
+ * This is made possible thanks to a tabbed pane, where in each tab there are text field and a button for a specific request
+ *
+ * @author  Francesco Pirrò - Matr.544539
+ */
 /*package*/ class SelectOperation extends JPanel {
 
-
+    /**
+     * MainForm that uses this panel
+     */
     private final MainForm main;
+
+    /**
+     * JTabbedPane that store different tabs
+     */
     private final JTabbedPane selector;
 
+    /**
+     * class constructor
+     * @param mainForm MainForm that uses this panel
+     */
     /*package*/ SelectOperation(MainForm mainForm ){
         super();
         main=mainForm;
@@ -20,6 +35,9 @@ import java.text.NumberFormat;
         selector=new JTabbedPane();
     }
 
+    /**
+     * private method that adds all the tabs to selector
+     */
     private void addToSelector(){
         JPanel createPanel=initializeCreatePanel();
         JPanel showAllPanel=initializeShowDocumentPanel();
@@ -33,6 +51,10 @@ import java.text.NumberFormat;
         selector.add("Edit Document",editPanel);
     }
 
+    /**
+     * Method that initialize the panel that contains ui components to send a create request
+     * @return new panel
+     */
     private JPanel initializeCreatePanel(){
         JButton create=new JButton("Create");
         JTextField docName=new JTextField();
@@ -46,6 +68,10 @@ import java.text.NumberFormat;
         return panel;
     }
 
+    /**
+     * Method that initialize the panel that contains ui components to send a show document request
+     * @return new panel
+     */
     private JPanel initializeShowDocumentPanel(){
         JPanel panel=new JPanel();
         panel.setLayout(new BoxLayout(panel,BoxLayout.PAGE_AXIS));
@@ -60,6 +86,10 @@ import java.text.NumberFormat;
         return panel;
     }
 
+    /**
+     * Method that initialize the panel that contains ui components to send a show section request
+     * @return new panel
+     */
     private JPanel initializeShowSectionPanel(){
         JButton show=new JButton("Show");
         JTextField docName=new JTextField();
@@ -73,6 +103,10 @@ import java.text.NumberFormat;
         return panel;
     }
 
+    /**
+     * Method tha initialize the panel that contains ui components to send a invite request
+     * @return new panel
+     */
     private JPanel initializeInviteUserPanel(){
         JButton invite=new JButton("Invite");
         JTextField docName=new JTextField();
@@ -86,6 +120,10 @@ import java.text.NumberFormat;
         return panel;
     }
 
+    /**
+     * Method that initialize the panel that contains ui components to send a edit request
+     * @return new panel
+     */
     private JPanel initializeEditDocumentPanel(){
         JButton edit=new JButton("Edit");
         JTextField docName=new JTextField();
@@ -99,6 +137,10 @@ import java.text.NumberFormat;
         return panel;
     }
 
+    /**
+     * Method that initialize the panel that contains 2 textfield and 2 text label
+     * @return new panel
+     */
     private static JPanel initializeBody(String label1,JTextField arg1,String label2,JTextField arg2){
         JPanel panel=new JPanel();
         panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
@@ -112,6 +154,11 @@ import java.text.NumberFormat;
         panel.add(secondColumn);
         return panel;
     }
+
+    /**
+     * Method that initialize the panel that contains 1 label and 1 textfield
+     * @return new panel
+     */
     private static JPanel initializeBody(String label,JTextField arg){
         JPanel panel=new JPanel();
         panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
@@ -122,6 +169,10 @@ import java.text.NumberFormat;
         return panel;
     }
 
+    /**
+     * Method that initialize the panel that a label and a component
+     * @return new panel
+     */
     private static JPanel textAndLabel(String label, Component text){
         Border padding=BorderFactory.createEmptyBorder(5,5,5,5);
         JPanel panel=new JPanel();
@@ -133,6 +184,9 @@ import java.text.NumberFormat;
 
     }
 
+    /**
+     * Method that initialize the selector
+     */
     /*package*/ void initialize(){
         add(selector);
         addToSelector();

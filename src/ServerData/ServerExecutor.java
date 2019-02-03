@@ -27,13 +27,44 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ServerExecutor implements Runnable {
 
+    /**
+     * Registered Users
+     */
     private final UserTable users;
+
+    /**
+     * Existing documents
+     */
     private final DocumentTable documents;
+
+    /**
+     * ChatOrganizer that keeps track of free and used multicast address
+     */
     private final ChatOrganizer chat;
+
+    /**
+     * SocketChannel used for communicating with the client
+     */
     private final SocketChannel socket;
+
+    /**
+     * Map of connected Users
+     */
     private final ConcurrentHashMap<SocketChannel,String> connectedUsers;
+
+    /**
+     * Queue of SocketChannel that needs to be added again to the selector keys set
+     */
     private final BlockingQueue<SocketChannel> selectorKeys;
+
+    /**
+     * selector that need to be waken up
+     */
     private final Selector selector;
+
+    /**
+     * DatagramChannel used to send notification to the client via UDP
+     */
     private final DatagramChannel channel;
 
     /**
@@ -198,6 +229,13 @@ public class ServerExecutor implements Runnable {
         return MessageBuffer.createMessageBuffer(result);
     }
 
+    /**
+     *
+     * @param Args Message arguments
+     * @param user user who sent the request
+     * @return reply message
+     * @throws IllegalArgumentException if the message is incomplete or invalid
+     */
     private MessageBuffer chatRoom(Vector<byte[]> Args,String user) throws IllegalArgumentException{
         if(Args.size()!=1) throw new IllegalArgumentException();
         String docName=new String(Args.get(0));
@@ -216,6 +254,10 @@ public class ServerExecutor implements Runnable {
         }
     }
 
+    /**
+     * Method to send Pending notification to an user
+     * @param user to send pending notification
+     */
     private void sendPendingNotification(String user){
         try{
             users.sendPendingNotification(user,channel);

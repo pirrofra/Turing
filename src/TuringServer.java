@@ -213,7 +213,10 @@ public class TuringServer {
        }
    }
 
-
+    /**
+     * Method that clear the path specified in dirPath
+     * @throws IOException if an error occurs while clearing the directory
+     */
    private static void clear()throws IOException{
        Scanner in=new Scanner(System.in);
        System.out.println("Attention, the entire content of "+dirPath +" is going to be deleted.\nPress Y to continue");
@@ -225,7 +228,11 @@ public class TuringServer {
        deleteDir(Paths.get(dirPath));
    }
 
-
+    /**
+     * private static method that recursively clear all dirPath content
+     * @param path path to be clear
+     * @throws IOException if an error occurs while clearing the directory
+     */
     private static void deleteDir(Path path) throws IOException{
         if(Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)){
             DirectoryStream<Path> files=Files.newDirectoryStream(path);

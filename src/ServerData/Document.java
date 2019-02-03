@@ -26,16 +26,46 @@ import java.util.Vector;
  *
  * @author Francesco Pirrò - Matr. 544539
  */
-/*package*/ class Document implements Serializable {
+/*package*/ class Document {
 
-
+    /**
+     * Maximum dimension of a section
+     */
     private final int sectionSize;
+
+    /**
+     * Document name
+     */
     private String documentName;
+
+    /**
+     * User who created the document
+     */
     private String creator;
+
+    /**
+     * Number of sections of the document
+     */
     private int numSection;
+
+    /**
+     * Path of every section
+     */
     private Path[] sectionPath;
+
+    /**
+     * User who are editing this document
+     */
     private String[] currentEdited;
+
+    /**
+     * List of users who can edit this document
+     */
     private Vector<String> userInvited;
+
+    /**
+     * Multicast Address for the chat room, if no one is currently editing this document chatAddress is null
+     */
     private String chatAddress;
 
     /**
@@ -68,9 +98,10 @@ import java.util.Vector;
         for(int i=1;i<=numSection;i++){
             sectionPath[i-1]=dir.resolve("."+i);
             try{
-                Files.createFile(sectionPath[i-1]);
+                Files.createFile(sectionPath[i-1]);//create an empty file
             }
             catch (FileAlreadyExistsException e){
+                //If a file with this name already exist create an empty new one
                 String empty="";
                 Files.write(sectionPath[i-1],empty.getBytes(),StandardOpenOption.TRUNCATE_EXISTING);
             }
@@ -258,6 +289,13 @@ import java.util.Vector;
         closeRoomIfEmpty(chat);
     }
 
+    /**
+     * Method that get the Room Address of the document, if chatAddress is null it generates a new address with a ChatOrganizer
+     * @param user user who wants to enter the Chat Room
+     * @param chat ChatOrganizer
+     * @return MessageBuffer containing the result
+     * @throws IllegalArgumentException if user is null
+     */
     /*package*/ synchronized MessageBuffer getRoomAddress(String user,ChatOrganizer chat)throws IllegalArgumentException{
         if(user==null) throw new IllegalArgumentException();
         boolean permission=false;
@@ -268,6 +306,7 @@ import java.util.Vector;
             if(chatAddress==null) chatAddress=chat.getNewAddress();
             ByteBuffer buffer=ByteBuffer.allocate(4);
             buffer.putInt(chat.getPort());
+            if(chatAddress==null) return MessageBuffer.createMessageBuffer(Operation.FAIL);
             return MessageBuffer.createMessageBuffer(Operation.OK,chatAddress.getBytes(),buffer.array(),user.getBytes());
         }
         else return MessageBuffer.createMessageBuffer(Operation.EDITING_NOT_REQUESTED);
@@ -301,6 +340,10 @@ import java.util.Vector;
         return buffer;
     }
 
+    /**
+     * Method that sets the chatAddress null, if no one is editing it
+     * @param chat ChatOrganizer that stores information about currently used address
+     */
     private void closeRoomIfEmpty(ChatOrganizer chat){
         boolean empty=true;
         for(int i=0;i<numSection;i++){

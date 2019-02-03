@@ -21,8 +21,19 @@ import java.util.Vector;
  */
 public class MessageBuffer {
 
+    /**
+     * Operation type
+     */
     private final Operation OP;
+
+    /**
+     * dimension of the body
+     */
     private final int dimension;
+
+    /**
+     * ByteBuffer that contains the body of the message
+     */
     private final ByteBuffer body;
 
     /**
@@ -52,13 +63,13 @@ public class MessageBuffer {
         int dim=0;
         ByteBuffer body=null;
         for(byte[] array:Args){
-            dim+=array.length+4;
+            dim+=array.length+4;//calculate dimension body
         }
         if(dim!=0) {
             body=ByteBuffer.allocate(dim);
             for(byte[] array:Args){
                 body.putInt(array.length);
-                body.put(array);
+                body.put(array); //put all arguments in buffer
             }
             body.flip();
         }
@@ -75,11 +86,11 @@ public class MessageBuffer {
         ByteBuffer header=ByteBuffer.allocate(8);
         read(socket,header,8);
         header.flip();
-        int value=header.getInt();
+        int value=header.getInt(); //read operation
         Operation op=Operation.valueOf(value);
-        int dimension=header.getInt();
+        int dimension=header.getInt(); //read dimension of body
         ByteBuffer body=ByteBuffer.allocate(dimension);
-        read(socket,body,dimension);
+        read(socket,body,dimension);//read body
         body.flip();
         return new MessageBuffer(op,body);
     }
@@ -94,8 +105,8 @@ public class MessageBuffer {
         header.putInt(OP.value);
         header.putInt(dimension);
         header.flip();
-        write(socket,header,8);
-        write(socket,body,dimension);
+        write(socket,header,8); //send header
+        write(socket,body,dimension);//send body
     }
 
     /**
@@ -144,9 +155,9 @@ public class MessageBuffer {
         Vector<byte[]> argsVector=new Vector<>();
         if(body!=null){
             while(body.hasRemaining()){
-                int dimension=body.getInt();
+                int dimension=body.getInt(); //dimension of the argument
                 byte[] arg=new byte[dimension];
-                body.get(arg);
+                body.get(arg);//actual argument
                 argsVector.add(arg);
             }
             body.flip();
