@@ -217,6 +217,7 @@ public class RequestExecutor {
     /**
      * Method to get the serverAddress
      * @return server remote address
+     * @throws IOException if an error occurs while getting the Remote Address
      */
     /*package*/ String getRemoteAddress() throws IOException {
         return channel.getRemoteAddress().toString();

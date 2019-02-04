@@ -31,24 +31,94 @@ import java.util.concurrent.*;
  */
 public class TuringServer {
 
+    /**
+     * Possible maximum value for document size
+     */
     private static final double max=Integer.MAX_VALUE*0.9;
+
+    /**
+     * Number of threads of thread pool, received from configuration file
+     */
     private static int numThreads;
+
+    /**
+     * path used by the server to store files, received from configuration file
+     */
     private static String dirPath;
+
+    /**
+     * Base Address used to generate Multicast address, received from configuration file
+     */
     private static String baseAddress;
+
+    /**
+     * bound used to generate Multicast address, received from configuration file
+     */
     private static int bound;
+
+    /**
+     * port used by the server for RMI service, received from configuration file
+     */
     private static int portRMI;
+
+    /**
+     * port used by the server dispatcher, received from configuration file
+     */
     private static int portTCP;
+
+    /**
+     * port used by the server to open a UDP channel, received from configuration file
+     */
     private static int UDPPort;
+
+    /**
+     * Timeout value for the selector, received from configuration file
+     */
     private static int timeout;
+
+    /**
+     * port that must be used by client to communicate via multicast group , received from configuration file
+     */
     private static int portChat;
+
+    /**
+     * actual maximum document size, received from configuration file. Is always smaller or equal to max
+     */
     private static int documentSize;
 
+    /**
+     * ServerData used to store Turing information
+     */
     private static ServerData data;
+
+    /**
+     * Selector used to find ready channels
+     */
     private static Selector selector=null;
+
+    /**
+     * Blocking queue used to receive channels that needs to be registered again from thread that terminated
+     */
     private static BlockingQueue<SocketChannel>queue;
+
+    /**
+     * Thread pool of ServerExecutors
+     */
     private static ThreadPoolExecutor pool;
+
+    /**
+     * Properties read from configuration file
+     */
     private static Properties config;
+
+    /**
+     * Default properties
+     */
     private static final Properties defaultConfig=new Properties();
+
+    /**
+     * DatagramChannel used to send notification
+     */
     private static DatagramChannel notificationChannel;
 
     /**
@@ -62,13 +132,13 @@ public class TuringServer {
         config=new Properties(defaultConfig);
         try {
             setProperties();
-            clear();
+            clear();//clear directory
             data=ServerData.createServerData(dirPath,documentSize,baseAddress,bound,portChat,portRMI);
             notificationChannel =DatagramChannel.open();
-            notificationChannel.socket().bind(new InetSocketAddress(UDPPort));
-            dispatcher= openDispatcher();
-            selector= Selector.open();
-            dispatcher.register(selector, SelectionKey.OP_ACCEPT);
+            notificationChannel.socket().bind(new InetSocketAddress(UDPPort));//set UDP channel for notifications
+            dispatcher= openDispatcher(); //open dispatcher
+            selector= Selector.open(); //open selector
+            dispatcher.register(selector, SelectionKey.OP_ACCEPT); //dispatcher added to selector
             System.out.println("Turing Server Started at " + InetAddress.getLocalHost().toString()+":"+portTCP);
         }
         catch (IOException e){
@@ -95,7 +165,7 @@ public class TuringServer {
         Vector<SocketChannel> list=new Vector<>();
         queue.drainTo(list);
         for(SocketChannel socket:list){
-            socket.register(selector,SelectionKey.OP_READ);
+            socket.register(selector,SelectionKey.OP_READ); //all socketChannel are registered again to the selector
         }
    }
 
@@ -133,9 +203,9 @@ public class TuringServer {
    private static void readableKey(SelectionKey key)throws IOException{
         SocketChannel client=(SocketChannel) key.channel();
         key.cancel();
-        ServerExecutor thread=new ServerExecutor(data,client,queue,selector, notificationChannel);
-       System.out.println("New request received from "+client.getRemoteAddress().toString());
-        pool.execute(thread);
+        ServerExecutor thread=new ServerExecutor(data,client,queue,selector, notificationChannel); //a new ServerExecutor is created
+        System.out.println("New request received from "+client.getRemoteAddress().toString());
+        pool.execute(thread); //new ServerExecutor is added to the thread pool
    }
 
     /**
@@ -143,14 +213,14 @@ public class TuringServer {
      * @throws IOException if an i/o error occurs
      */
    private static void select() throws IOException{
-       retrieveSocketChannels();
+       retrieveSocketChannels(); //all socketChannel from the queue are added to the selector
        selector.select(timeout);
        Set<SelectionKey> selectionKeySet=selector.selectedKeys();
        Iterator<SelectionKey> iterator=selectionKeySet.iterator();
        while(iterator.hasNext()){
            SelectionKey key=iterator.next();
-           if(key.isAcceptable()) acceptableKey(key);
-           else if(key.isReadable()) readableKey(key);
+           if(key.isAcceptable()) acceptableKey(key); //some client wants to connect
+           else if(key.isReadable()) readableKey(key); //some client wants to send some request
            iterator.remove();
        }
    }

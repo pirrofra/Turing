@@ -82,7 +82,7 @@ import java.awt.event.*;
 
     /**
      * Implementation of the actionPerformed method of the interface ActionListener
-     * @param e
+     * @param e actionEvent
      */
     public void actionPerformed(ActionEvent e) {
         dispose(); //close this form

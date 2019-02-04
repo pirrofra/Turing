@@ -139,6 +139,11 @@ import java.awt.*;
 
     /**
      * Method that initialize the panel that contains 2 textfield and 2 text label
+     *
+     * @param label1 label first argument
+     * @param arg1 TextBox first argument
+     * @param label2 label second argument
+     * @param arg2 TextBox second argument
      * @return new panel
      */
     private static JPanel initializeBody(String label1,JTextField arg1,String label2,JTextField arg2){
@@ -157,6 +162,8 @@ import java.awt.*;
 
     /**
      * Method that initialize the panel that contains 1 label and 1 textfield
+     * @param label label of the only argument
+     * @param arg TextBox of the only argument
      * @return new panel
      */
     private static JPanel initializeBody(String label,JTextField arg){
@@ -171,6 +178,8 @@ import java.awt.*;
 
     /**
      * Method that initialize the panel that a label and a component
+     * @param label label of the component to be add
+     * @param text component to added
      * @return new panel
      */
     private static JPanel textAndLabel(String label, Component text){
