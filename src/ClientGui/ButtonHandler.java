@@ -2,6 +2,7 @@ package ClientGui;
 
 import Message.MessageBuffer;
 import Message.Operation;
+import RequestExecutor.RequestExecutor;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -81,7 +82,6 @@ import java.util.Vector;
         String log="";
         if(result.getOP()==Operation.OK){
             log+="Document "+arg1.getText()+" successfully created with "+value+" sections";
-            main.update();
         }
         else
             log+=Operation.getDescription(result.getOP());
@@ -222,6 +222,7 @@ import java.util.Vector;
             dialog=new ResultDialog( main,"Connection lost with Server",true,false);
         }
         main.setEnabled(true);
+        main.update();
         if(dialog!=null) dialog.show(400,100);
     }
 

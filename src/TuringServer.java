@@ -67,11 +67,6 @@ public class TuringServer {
     private static int portTCP;
 
     /**
-     * port used by the server to open a UDP channel, received from configuration file
-     */
-    private static int UDPPort;
-
-    /**
      * Timeout value for the selector, received from configuration file
      */
     private static int timeout;
@@ -117,11 +112,6 @@ public class TuringServer {
     private static final Properties defaultConfig=new Properties();
 
     /**
-     * DatagramChannel used to send notification
-     */
-    private static DatagramChannel notificationChannel;
-
-    /**
      * Server Main
      * @param args No arguments needed in this main
      */
@@ -134,8 +124,6 @@ public class TuringServer {
             setProperties();
             clear();//clear directory
             data=ServerData.createServerData(dirPath,documentSize,baseAddress,bound,portChat,portRMI);
-            notificationChannel =DatagramChannel.open();
-            notificationChannel.socket().bind(new InetSocketAddress(UDPPort));//set UDP channel for notifications
             dispatcher= openDispatcher(); //open dispatcher
             selector= Selector.open(); //open selector
             dispatcher.register(selector, SelectionKey.OP_ACCEPT); //dispatcher added to selector
@@ -154,6 +142,7 @@ public class TuringServer {
                 e.printStackTrace();
             }
         }
+        data.close();
 
    }
 
@@ -203,7 +192,7 @@ public class TuringServer {
    private static void readableKey(SelectionKey key)throws IOException{
         SocketChannel client=(SocketChannel) key.channel();
         key.cancel();
-        ServerExecutor thread=new ServerExecutor(data,client,queue,selector, notificationChannel); //a new ServerExecutor is created
+        ServerExecutor thread=new ServerExecutor(data,client,queue,selector); //a new ServerExecutor is created
         System.out.println("New request received from "+client.getRemoteAddress().toString());
         pool.execute(thread); //new ServerExecutor is added to the thread pool
    }
@@ -248,7 +237,6 @@ public class TuringServer {
        portRMI=getIntegerProperty("portRMI");
        timeout=getIntegerProperty("timeout");
        portChat=getIntegerProperty("portChat");
-       UDPPort=getIntegerProperty("portUDP");
        documentSize=getIntegerProperty("documentSize");
        if(documentSize>max||documentSize<1023) documentSize=(int) max;
    }
@@ -261,7 +249,6 @@ public class TuringServer {
        defaultConfig.setProperty("multicastBaseAddress","239.0.0.0");
        defaultConfig.setProperty("multicastBound","10000");
        defaultConfig.setProperty("numThreads","8");
-       defaultConfig.setProperty("portUDP","55433");
        defaultConfig.setProperty("portTCP","55432");
        defaultConfig.setProperty("portRMI","55431");
        defaultConfig.setProperty("portChat","56127");

@@ -3,8 +3,8 @@ package ServerData;
 import ChatRoom.ChatOrganizer;
 import RemoteUserTable.RemoteUserTable;
 
-import java.io.Serializable;
 import java.nio.channels.SocketChannel;
+import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -44,6 +44,8 @@ public class ServerData {
      */
     private final ConcurrentHashMap<SocketChannel,String> connectedUsers;
 
+    private Registry reg;
+
     /**
      * Private class constructor
      * @param path Path to use for storing documents
@@ -75,6 +77,7 @@ public class ServerData {
         documents=new DocumentTable(path,maxSize,initialCapacity,loadFactor,concurrencyLevel);
         connectedUsers=new ConcurrentHashMap<>();
         chat=new ChatOrganizer(baseAddress,bound,port);
+        reg=null;
     }
 
     /**
@@ -113,7 +116,7 @@ public class ServerData {
     private void activateRMI(int port) throws RemoteException{
         RemoteUserTable stub= (RemoteUserTable)UnicastRemoteObject.exportObject(users,0);
         LocateRegistry.createRegistry(port);
-        Registry reg=LocateRegistry.getRegistry(port);
+        reg=LocateRegistry.getRegistry(port);
         reg.rebind("USERTABLE-TURING",stub);
     }
 
@@ -132,6 +135,15 @@ public class ServerData {
         ServerData newData=new ServerData(path,baseAddress,bound,chatPort,maxSize);
         newData.activateRMI(RMIport);
         return newData;
+    }
+
+    public void close(){
+        try{
+            UnicastRemoteObject.unexportObject(reg,false);
+        }
+        catch (NoSuchObjectException ex){
+            //do nothing
+        }
     }
 
 }

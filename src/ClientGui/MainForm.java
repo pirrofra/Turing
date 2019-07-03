@@ -3,6 +3,8 @@ package ClientGui;
 
 import Message.MessageBuffer;
 import Message.Operation;
+import RemoteClientNotifier.RemoteClientNotifier;
+import RequestExecutor.RequestExecutor;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -10,8 +12,12 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.DatagramChannel;
+import java.rmi.NoSuchObjectException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.ExportException;
+import java.rmi.server.UnicastRemoteObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
@@ -33,6 +39,8 @@ public class MainForm extends JFrame {
      * RequestExecutor that communicates with the server
      */
     private final RequestExecutor executor;
+
+    private final int RMIport;
 
     /**
      * JTextArea that keeps track of log from the server
@@ -59,24 +67,18 @@ public class MainForm extends JFrame {
      */
     private JLabel connectionStatus;
 
-    /**
-     * UDP port used to listen for notification from server
-     */
-    private int UDPPort;
-
-    /**
-     * Thread that listen for notification
-     */
-    private NotificationListener thread;
+    private ClientNotifier notifier;
+    private Registry reg;
 
     /**
      * public class constructor
      * @param exec RequestExecutor that communicate with server
      */
-    public MainForm(RequestExecutor exec){
+    public MainForm(RequestExecutor exec, int port){
         super("Turing Client");
         executor=exec;
-        thread=null;
+        notifier =null;
+        RMIport=port;
     }
 
     /**
@@ -122,7 +124,7 @@ public class MainForm extends JFrame {
                 MessageBuffer result=executor.logout(); //send logout request to server
                 if(result.getOP()==Operation.OK){
                     //if log out is successful, a new LogForm is opened
-                    LogForm logForm=new LogForm(mainForm,UDPPort);
+                    LogForm logForm=new LogForm(mainForm,RMIport);
                     logForm.initialize();
                     logFromServer.setText("");
                     list.setText("");
@@ -208,28 +210,44 @@ public class MainForm extends JFrame {
 
     /**
      * Method that opens a MainForm
-     * @throws IOException if an error occurs while opening the DatagramChannel
+     * @throws RemoteException if an error occurs while exporting the RemoteClientNotifier
      */
-    public void open() throws IOException{
+    public void open() throws RemoteException {
         setVisible(true);
         pack();
-        DatagramChannel channel=DatagramChannel.open();
-        channel.socket().bind(new InetSocketAddress(0));
-        UDPPort=channel.socket().getLocalPort();
-        LogForm login=new LogForm(this,UDPPort);
+        if (notifier ==null){
+            notifier =new ClientNotifier(this);
+            RemoteClientNotifier stub= (RemoteClientNotifier) UnicastRemoteObject.exportObject(notifier,0);
+            try{
+                LocateRegistry.createRegistry(RMIport);
+            }
+            catch (ExportException e){
+                String msg="Port "+RMIport+" cannot be used for the Notifier. Try again with a new port";
+                ResultDialog dialog=new ResultDialog(this,msg,true,true);
+                dialog.show(400,100);
+                return;
+            }
+
+            reg=LocateRegistry.getRegistry(RMIport);
+            reg.rebind("NOTIFIER-TURING",stub);
+        }
+
+        LogForm login=new LogForm(this,RMIport);
         login.initialize();
         login.setVisible(true);
-        if(thread==null){
-            //Start notification thread
-            thread=new NotificationListener(channel,this);
-            thread.start();
-        }
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 //When the windows is closing it interrupts the thread
                 super.windowClosing(e);
-                thread.interrupt();
+                try{
+                    UnicastRemoteObject.unexportObject(reg,false);
+                }
+                catch (NoSuchObjectException ex){
+                    //do nothing
+                }
+
             }
         });
     }

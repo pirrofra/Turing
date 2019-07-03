@@ -3,6 +3,7 @@ package ClientGui;
 import ChatRoom.ChatRoom;
 import Message.MessageBuffer;
 import Message.Operation;
+import RequestExecutor.RequestExecutor;
 
 import javax.swing.*;
 import javax.swing.border.Border;

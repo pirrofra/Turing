@@ -3,6 +3,7 @@ package ClientGui;
 
 import Message.MessageBuffer;
 import Message.Operation;
+import RequestExecutor.RequestExecutor;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -61,22 +62,17 @@ import java.io.IOException;
      */
     private final MainForm main;
 
-    /**
-     * UDP port where the client is listening for notifications
-     */
-    private final int UDPPort;
-
+    private final int RMIport;
     /**
      * class constructor
      * @param father MainForm that created the LogForm
-     * @param port UDP port where the client is listening for notifications
      */
-    /*package*/ LogForm(MainForm father,int port) {
+    /*package*/ LogForm(MainForm father, int port) {
         super(father,"Turing Client",true);
         executor=father.getExecutor();
         main=father;
+        RMIport=port;
         loggedIn=false;
-        UDPPort=port;
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
@@ -141,7 +137,7 @@ import java.io.IOException;
             String pass=new String(password.getPassword());
             ResultDialog dialog;
             try{
-                MessageBuffer result=executor.login(username.getText(),pass,UDPPort); //send login request to the server
+                MessageBuffer result=executor.login(username.getText(),pass,RMIport); //send login request to the server
                 if(result.getOP()==Operation.OK){
                     dialog=new ResultDialog(me,"Log in is successful!",false,true);
                     loggedIn=true;

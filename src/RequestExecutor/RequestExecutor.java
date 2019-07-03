@@ -1,4 +1,4 @@
-package ClientGui;
+package RequestExecutor;
 
 import Message.MessageBuffer;
 import Message.Operation;
@@ -64,7 +64,7 @@ public class RequestExecutor {
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/ synchronized MessageBuffer login(String username,String password,int port) throws IOException{
+     public synchronized MessageBuffer login(String username,String password,int port) throws IOException{
         ByteBuffer buffer=ByteBuffer.allocate(4);
         buffer.putInt(port);
         MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.LOGIN,username.getBytes(),password.getBytes(),buffer.array());
@@ -79,7 +79,7 @@ public class RequestExecutor {
      * @return Operation with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/ Operation register(String username,String password) throws IOException{
+     public Operation register(String username,String password) throws IOException{
         Registry reg= LocateRegistry.getRegistry(server,RMIport);
         try{
             RemoteUserTable userTable = (RemoteUserTable) reg.lookup("USERTABLE-TURING");
@@ -100,7 +100,7 @@ public class RequestExecutor {
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/synchronized MessageBuffer createDocument(String docName,int numSection) throws IOException{
+     public synchronized MessageBuffer createDocument(String docName,int numSection) throws IOException{
         ByteBuffer buffer=ByteBuffer.allocate(4);
         buffer.putInt(numSection);
         MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.CREATE,docName.getBytes(),buffer.array());
@@ -114,7 +114,7 @@ public class RequestExecutor {
      *@return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/synchronized MessageBuffer show(String docName) throws IOException{
+    public synchronized MessageBuffer show(String docName) throws IOException{
         MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.SHOW,docName.getBytes());
         request.sendMessage(channel);
         return MessageBuffer.readMessage(channel);
@@ -127,7 +127,7 @@ public class RequestExecutor {
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/ synchronized MessageBuffer show(String docName,int section) throws IOException{
+     public synchronized MessageBuffer show(String docName,int section) throws IOException{
         ByteBuffer buffer=ByteBuffer.allocate(4);
         buffer.putInt(section);
         buffer.flip();
@@ -143,7 +143,7 @@ public class RequestExecutor {
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/synchronized MessageBuffer invite(String docName,String user) throws IOException{
+     public synchronized MessageBuffer invite(String docName,String user) throws IOException{
         MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.INVITE,docName.getBytes(),user.getBytes());
         request.sendMessage(channel);
         return MessageBuffer.readMessage(channel);
@@ -156,7 +156,7 @@ public class RequestExecutor {
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/synchronized MessageBuffer edit(String docName,int section) throws IOException{
+     public synchronized MessageBuffer edit(String docName,int section) throws IOException{
         ByteBuffer buffer=ByteBuffer.allocate(4);
         buffer.putInt(section);
         MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.EDIT,docName.getBytes(),buffer.array());
@@ -169,7 +169,7 @@ public class RequestExecutor {
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/ synchronized MessageBuffer list() throws IOException{
+     public synchronized MessageBuffer list() throws IOException{
         MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.LIST);
         request.sendMessage(channel);
         return MessageBuffer.readMessage(channel);
@@ -180,7 +180,7 @@ public class RequestExecutor {
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/synchronized MessageBuffer logout() throws IOException{
+     public synchronized MessageBuffer logout() throws IOException{
         MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.LOGOUT);
         request.sendMessage(channel);
         return MessageBuffer.readMessage(channel);
@@ -194,7 +194,7 @@ public class RequestExecutor {
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/synchronized MessageBuffer endEdit(String docName,int section,byte[] file ) throws IOException{
+     public synchronized MessageBuffer endEdit(String docName,int section,byte[] file ) throws IOException{
         ByteBuffer buffer=ByteBuffer.allocate(4);
         buffer.putInt(section);
         MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.END_EDIT,docName.getBytes(),buffer.array(),file);
@@ -208,7 +208,7 @@ public class RequestExecutor {
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */
-    /*package*/ synchronized MessageBuffer chatRoom(String docName) throws IOException{
+     public synchronized MessageBuffer chatRoom(String docName) throws IOException{
         MessageBuffer request=MessageBuffer.createMessageBuffer(Operation.CHAT_ROOM,docName.getBytes());
         request.sendMessage(channel);
         return MessageBuffer.readMessage(channel);
@@ -219,7 +219,7 @@ public class RequestExecutor {
      * @return server remote address
      * @throws IOException if an error occurs while getting the Remote Address
      */
-    /*package*/ String getRemoteAddress() throws IOException {
+     public String getRemoteAddress() throws IOException {
         return channel.getRemoteAddress().toString();
     }
 
@@ -227,7 +227,7 @@ public class RequestExecutor {
      * Getter for the path files are stored in
      * @return path the files are stored in
      */
-    /*package*/ String getFilePath(){
+     public String getFilePath(){
         return filePath;
     }
 

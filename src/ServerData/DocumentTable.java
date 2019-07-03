@@ -5,7 +5,6 @@ import Message.MessageBuffer;
 import Message.Operation;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

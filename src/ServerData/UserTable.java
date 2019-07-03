@@ -4,9 +4,6 @@ import Message.Operation;
 import RemoteUserTable.RemoteUserTable;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.net.InetSocketAddress;
-import java.nio.channels.DatagramChannel;
 import java.rmi.server.RemoteServer;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,11 +67,11 @@ import java.util.concurrent.ConcurrentHashMap;
      *         Message.Operation.OK if login successful
      * @throws IllegalArgumentException if password and/or username are null
      */
-    /*package*/ Operation logIn(String username, String password, InetSocketAddress address) throws  IllegalArgumentException{
+    /*package*/ Operation logIn(String username, String password, String address, int port) throws  IllegalArgumentException{
         if(username==null) throw new IllegalArgumentException();
         User user=userMap.get(username);
         if(user==null) return Operation.USER_NOT_FOUND;
-        else return user.login(password,address);
+        else return user.login(password,address,port);
     }
 
     /**
@@ -146,25 +143,22 @@ import java.util.concurrent.ConcurrentHashMap;
      * Method that send a Notification to an user
      * @param username user to send a notification to
      * @param msg message to be sent as a notification
-     * @param channel channel used for communication
      */
-    /*package*/ void sendNotification(String username, String msg, DatagramChannel channel){
+    /*package*/ void sendNotification(String username, String msg){
         if(username!=null){
             User user=userMap.get(username);
-            if(user!=null) user.notify(msg,channel);
+            if(user!=null) user.notify(msg);
         }
     }
 
     /**
      * Method that send pending Notification to an user
      * @param username user to send notification to
-     * @param channel channel used for communications
-     * @throws IOException if an error occurs while sending pending notifications
      */
-    /*package*/ void sendPendingNotification(String username, DatagramChannel channel) throws IOException {
+    /*package*/ void sendPendingNotification(String username) {
         if(username!=null){
             User user=userMap.get(username);
-            if(user!=null) user.sendPendingNotification(channel);
+            if(user!=null) user.sendPendingNotification();
         }
     }
 

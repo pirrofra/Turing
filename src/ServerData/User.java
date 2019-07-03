@@ -1,12 +1,12 @@
 package ServerData;
 
 import Message.Operation;
+import RemoteClientNotifier.RemoteClientNotifier;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
+import java.rmi.NotBoundException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Vector;
 
 /**
@@ -48,9 +48,11 @@ import java.util.Vector;
     private String editingDocument;
 
     /**
-     * SocketAddress for sending notification to
+     *
      */
-    private InetSocketAddress client;
+    private int RMIPort;
+
+    private String address;
 
     /**
      * number of pending notification
@@ -69,7 +71,7 @@ import java.util.Vector;
         password=psw;
         documentList=new Vector<>();
         editingDocument=null;
-        client=null;
+        RMIPort=-1;
         pendingNotification=0;
     }
 
@@ -84,17 +86,19 @@ import java.util.Vector;
     /**
      * Method to notify user has logged in if password is correct
      * @param psw password for login
-     * @param address Address of the client the user is connected with
+     * @param addr Address of the client the user is connected with
+     * @param port Port used by the client for RMI
      * @return Message.Operation.Already_Logged_in if user is already logged in, Message.Operation.Password_incorrect if psw!=user.password
      *         Message.Operation.OK if login successful
      * @throws IllegalArgumentException if psw is null or an empty string
      */
-    /*package*/ synchronized Operation login(String psw, InetSocketAddress address) throws IllegalArgumentException{
+    /*package*/ synchronized Operation login(String psw, String addr, int port) throws IllegalArgumentException{
         if (psw==null || psw.compareTo("")==0) throw new IllegalArgumentException();
         else if(loggedIn) return Operation.ALREADY_LOGGED_IN;
         else if(psw.compareTo(password)==0){
             loggedIn=true;
-            client=address;
+            RMIPort=port;
+            address=addr;
             return Operation.OK;
         }
         else return Operation.PASSWORD_INCORRECT;
@@ -149,24 +153,24 @@ import java.util.Vector;
         loggedIn=false;
         String doc=editingDocument;
         editingDocument=null;
-        client=null;
+        RMIPort=-1;
+        address=null;
         return doc;
     }
 
     /**
      * Method that notify an user if an invite has been received, or it increments the number of pending notification
      * @param msg message to be sent as a notification
-     * @param channel channel used for the communication
      */
-    /*package*/ synchronized void notify(String msg, DatagramChannel channel){
+    /*package*/ synchronized void notify(String msg){
         if(!loggedIn) ++pendingNotification;
         else{
-            msg=msg.substring(0,Math.min(msg.length(),1024));
-            ByteBuffer buffer=ByteBuffer.wrap(msg.getBytes());
             try{
-                channel.send(buffer,client);
+                Registry reg= LocateRegistry.getRegistry(address,RMIPort);
+                RemoteClientNotifier notifier = (RemoteClientNotifier) reg.lookup("NOTIFIER-TURING");
+                notifier.notify(msg);
             }
-            catch (IOException e){
+            catch (IOException | NotBoundException e){
                 ++pendingNotification;
             }
         }
@@ -174,15 +178,19 @@ import java.util.Vector;
 
     /**
      * Method that sends all pending notification to an user if the number of pending notification in more than 0
-     * @param channel used for the communication
-     * @throws IOException if an error occurs while sending pending notification
      */
-    /*package*/ synchronized void sendPendingNotification(DatagramChannel channel) throws IOException{
+    /*package*/ synchronized void sendPendingNotification(){
         if(loggedIn && pendingNotification>0){
             String msg="You had " + pendingNotification +" invite while you where away";
-            ByteBuffer buffer=ByteBuffer.wrap(msg.getBytes());
-            channel.send(buffer,client);
-            pendingNotification=0;
+            try{
+                Registry reg= LocateRegistry.getRegistry(address,RMIPort);
+                RemoteClientNotifier notifier = (RemoteClientNotifier) reg.lookup("NOTIFIER-TURING");
+                notifier.notify(msg);
+                pendingNotification=0;
+            }
+            catch (IOException | NotBoundException e) {
+                //do nothing
+            }
         }
     }
 

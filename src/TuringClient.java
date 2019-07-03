@@ -1,5 +1,5 @@
 import ClientGui.MainForm;
-import ClientGui.RequestExecutor;
+import RequestExecutor.RequestExecutor;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +22,8 @@ public class TuringClient{
      * server RMI port, received from configuration file
      */
     private static int portRMI;
+
+    private static int portNotifier;
 
     /**
      * directory path used to store files received from server, received from configuration file
@@ -66,7 +68,7 @@ public class TuringClient{
             System.exit(-1);
         }
         exec=new RequestExecutor(channel,server,portRMI,dir); //new Request Executor is created
-        form=new MainForm(exec); //new MainForm is created
+        form=new MainForm(exec,portNotifier); //new MainForm is created
         form.initialize(); //mainForm is initialized
         try{
             form.open(); //MainForm is opened
@@ -85,6 +87,7 @@ public class TuringClient{
     private static void setDefault(){
         defaultConfig.setProperty("portTCP","55432");
         defaultConfig.setProperty("portRMI","55431");
+        defaultConfig.setProperty("portNotifier","1099");
         defaultConfig.setProperty("dirFiles","clientFiles/");
     }
 
@@ -105,6 +108,8 @@ public class TuringClient{
         }
         portTCP=getIntegerProperty("portTCP");
         portRMI=getIntegerProperty("portRMI");
+        portNotifier=getIntegerProperty("portNotifier");
+        portNotifier=getIntegerProperty("portNotifier");
         dir=config.getProperty("dirFiles");
     }
 

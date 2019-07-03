@@ -5,10 +5,8 @@ import Message.MessageBuffer;
 import Message.Operation;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Vector;
@@ -63,19 +61,13 @@ public class ServerExecutor implements Runnable {
     private final Selector selector;
 
     /**
-     * DatagramChannel used to send notification to the client via UDP
-     */
-    private final DatagramChannel channel;
-
-    /**
      * Public class constructor
      * @param data ServerData containing all server information
      * @param sock Socket from where the request is happening
      * @param queue queue containing all sockets needed to be register for the selector, again
      * @param s Selector to wakeup when request is completed
-     * @param c DatagramChannel used to send notifications
      */
-    public ServerExecutor(ServerData data, SocketChannel sock, BlockingQueue<SocketChannel> queue, Selector s, DatagramChannel c){
+    public ServerExecutor(ServerData data, SocketChannel sock, BlockingQueue<SocketChannel> queue, Selector s){
         users=data.getUserTable();
         documents=data.getDocumentTable();
         connectedUsers=data.getConnectedUsers();
@@ -83,7 +75,6 @@ public class ServerExecutor implements Runnable {
         socket=sock;
         selectorKeys=queue;
         selector=s;
-        channel=c;
     }
 
     /**
@@ -99,9 +90,8 @@ public class ServerExecutor implements Runnable {
         String password=new String(Args.get(1));
         int port= ByteBuffer.wrap(Args.get(2)).getInt();
         InetSocketAddress remoteSocketAddress=(InetSocketAddress) socket.getRemoteAddress();
-        InetAddress address=remoteSocketAddress.getAddress();
-        InetSocketAddress udpSocket=new InetSocketAddress(address,port);
-        Operation result=users.logIn(username,password,udpSocket);
+        String address=remoteSocketAddress.getHostString();
+        Operation result=users.logIn(username,password,address,port);
         if (result==Operation.OK) connectedUsers.put(socket,username);
         return MessageBuffer.createMessageBuffer(result);
     }
@@ -139,7 +129,7 @@ public class ServerExecutor implements Runnable {
         if(result==Operation.OK) {
             users.addDocument(invited,docName);
             String msg=user +" has invited you to edit " +docName;
-            users.sendNotification(invited,msg,channel);
+            users.sendNotification(invited,msg);
         }
         return MessageBuffer.createMessageBuffer(result);
     }
@@ -259,13 +249,7 @@ public class ServerExecutor implements Runnable {
      * @param user to send pending notification
      */
     private void sendPendingNotification(String user){
-        try{
-            users.sendPendingNotification(user,channel);
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
-
+            users.sendPendingNotification(user);
     }
 
     /**

@@ -51,6 +51,7 @@ import java.awt.event.*;
         Border padding=BorderFactory.createEmptyBorder(10,10,10,10);
         panel.setBorder(padding);
         add(panel);
+        message="<html>"+message+"</html>";
         panel.add(new JLabel(message), BorderLayout.CENTER);
         panel.add(ok,BorderLayout.SOUTH);
         getRootPane().setDefaultButton(ok);
