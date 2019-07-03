@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.DatagramChannel;
 
 /**
@@ -85,19 +86,18 @@ public class ChatRoom extends Thread {
                 String msg=new String(buffer.array());
                 chatBox.append(msg+"\n");
             }
-            catch (IOException e){
-                chatBox.append("--- CHAT CRASHED ---\n");
+            catch(ClosedChannelException e){
                 break;
             }
+            catch (IOException e){
+                e.printStackTrace();
+                chatBox.append("--- CHAT CRASHED ---\n");
+                close();
+            }
 
-            chatBox.setCaretPosition(chatBox.getText().length()); //set Caret position to the  bottom of the JtextArea
+            chatBox.setCaretPosition(chatBox.getText().length()); //set Caret position to the  bottom of the JTextArea
         }
-        try{
-            channel.close();
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
+
     }
 
     /**
@@ -121,6 +121,20 @@ public class ChatRoom extends Thread {
         while(msg.hasRemaining()){
             channel.send(msg,chatGroup);
         }
+    }
+
+    /**
+     * This makes possible to terminate the thread, by making channel.receive fail
+     */
+    public void close(){
+        this.interrupt();
+        try{
+            channel.close();
+        }
+        catch (IOException e){
+            //Do nothing
+        }
+
     }
 
 

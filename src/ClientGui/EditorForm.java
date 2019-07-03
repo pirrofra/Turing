@@ -97,8 +97,9 @@ import java.util.Vector;
                 if(isEditing){
                     ResultDialog dialog=new ResultDialog(mainFrame,"Editing interrupted. Closing APP",true,false);
                     dialog.show(400,100);
+                    chat.close();
                 }
-                chat.interrupt();
+
             }
         });
     }
@@ -152,7 +153,7 @@ import java.util.Vector;
                     if(result.getOP()== Operation.OK)
                         isEditing=false; //If the operation is successful, the user has stopped editing this file
                     dialog=new ResultDialog(me,result.getOP(),false,true);
-
+                    chat.close();
                 }
             }
             catch (IOException exception) {

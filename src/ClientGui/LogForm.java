@@ -145,7 +145,7 @@ import java.io.IOException;
                 if(result.getOP()==Operation.OK){
                     dialog=new ResultDialog(me,"Log in is successful!",false,true);
                     loggedIn=true;
-                    main.update(); //update mainForm document list
+                    main.update();
                 }
                 else dialog=new ResultDialog(me,result.getOP(),false,false); //error received
             }

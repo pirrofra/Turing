@@ -222,8 +222,8 @@ import java.util.Vector;
             dialog=new ResultDialog( main,"Connection lost with Server",true,false);
         }
         main.setEnabled(true);
-        main.update();
         if(dialog!=null) dialog.show(400,100);
+        main.update();
     }
 
     /**

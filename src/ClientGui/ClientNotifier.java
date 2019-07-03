@@ -28,6 +28,5 @@ import RemoteClientNotifier.RemoteClientNotifier;
     public void notify(String msg) {
         ResultDialog dialog = new ResultDialog(main, msg, false, false); //the content of the message is put in a ResultDialog and shown
         dialog.show(400, 100);
-        main.update();
     }
 }
