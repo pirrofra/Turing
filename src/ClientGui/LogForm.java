@@ -62,10 +62,14 @@ import java.io.IOException;
      */
     private final MainForm main;
 
+    /**
+     * Port to be used for RMI by the server
+     */
     private final int RMIport;
     /**
      * class constructor
      * @param father MainForm that created the LogForm
+     * @param port Port used for the RMI notifier
      */
     /*package*/ LogForm(MainForm father, int port) {
         super(father,"Turing Client",true);

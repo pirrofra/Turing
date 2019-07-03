@@ -73,6 +73,7 @@ public class MainForm extends JFrame {
     /**
      * public class constructor
      * @param exec RequestExecutor that communicate with server
+     * @param port Port used for the RMI notifier
      */
     public MainForm(RequestExecutor exec, int port){
         super("Turing Client");

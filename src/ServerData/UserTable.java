@@ -3,7 +3,6 @@ package ServerData;
 import Message.Operation;
 import RemoteUserTable.RemoteUserTable;
 
-import java.io.IOException;
 import java.rmi.server.RemoteServer;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,6 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
      * @param username username
      * @param password password
      * @param address Address of the client the user is connected from
+     * @param port Port used for the RMI notifier
      * @return Message.Operation.User_Not_Found if username is not an existing user,
      *         Message.Operation.Already_Logged_in if user is already logged in,
      *         Message.Operation.Password_incorrect if the password is incorrect,

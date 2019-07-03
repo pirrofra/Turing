@@ -5,7 +5,8 @@ import java.rmi.RemoteException;
 
 /**
  * This interface defines method that can be called using RMI
- * This interface is implemented by ClientGui.ClientNotificator class
+ * This interface is implemented by ClientGui.ClientNotifier class
+ * This is used by the server to notify a client that a new invite has been received
  *
  * @author Francesco Pirrò - Matr. 544539
  */
