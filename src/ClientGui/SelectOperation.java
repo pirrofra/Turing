@@ -190,7 +190,6 @@ import java.awt.*;
         panel.add(new JLabel(label));
         panel.add(text);
         return panel;
-
     }
 
     /**

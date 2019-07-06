@@ -28,7 +28,7 @@ import java.util.Vector;
  * and at the bottom a JPanel from where you can choose different request to send to the server.
  *
  * The method initialize create all UI component and fill the form
- * The method open show the form and start the NotificationListener thread that listen for UDP notification from the server
+ * The method open show the form and export the ClientNotifier
  * The method open also initialize and show a LogForm
  *
  * @author Francesco Pirrò - Matr.544539

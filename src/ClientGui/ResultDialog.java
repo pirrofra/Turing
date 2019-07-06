@@ -45,6 +45,7 @@ import java.awt.event.*;
         father=f;
         closeAppAtExit=closeApp;
         closeFormAtExit=closeForm;
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         JButton ok=new JButton("OK");
         ok.addActionListener(this);
         JPanel panel=new JPanel(new BorderLayout());

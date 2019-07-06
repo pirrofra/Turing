@@ -1,4 +1,5 @@
 
+import ClientGui.ConfigEditor;
 import ClientGui.MainForm;
 import RequestExecutor.RequestExecutor;
 
@@ -13,6 +14,10 @@ import java.nio.channels.SocketChannel;
 import java.util.Properties;
 
 public class TuringClient{
+    /**
+     * server address
+     */
+    private static String server;
 
     /**
      * server TCP port, received from configuration file
@@ -24,6 +29,9 @@ public class TuringClient{
      */
     private static int portRMI;
 
+    /**
+     * Client RMI port, used for RMI notifier
+     */
     private static int portNotifier;
 
     /**
@@ -42,32 +50,42 @@ public class TuringClient{
     private static final Properties defaultConfig=new Properties();
 
     /**
+     * Form used for editing Configuration File
+     */
+    private static ConfigEditor editor;
+
+    /**
+     * Object used to wait for ConfigEditor signal
+     */
+    private static final Object lock=new Object();
+    /**
      * Main function
      * @param args main arguments
      */
     public static void main(String[] args){
-        if(args.length!=1){
-            System.out.println("Usage: Client serverAddress");
-            System.exit(-1);
-        }
         setDefault();
         config=new Properties(defaultConfig);
-        String server=args[0]; //get server Address
         MainForm form;
         RequestExecutor exec;
-        SocketChannel channel=null;
+        SocketChannel channel;
         try{
-            setProperties(); //read properties
+            setProperties();//read properties
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        try{
             channel=SocketChannel.open(); //open Socket
             InetAddress serverAddress= InetAddress.getByName(server);//set socket
             SocketAddress SocketAddress=new InetSocketAddress(serverAddress,portTCP);
             channel.connect(SocketAddress); //connect to the server
         }
         catch (IOException e){
-            //An error occurs, the app is closed
-            e.printStackTrace();
-            System.exit(-1);
+            editor.connectionFailed();
+            return;
         }
+        editor.dispose();
         exec=new RequestExecutor(channel,server,portRMI,dir); //new Request Executor is created
         form=new MainForm(exec,portNotifier); //new MainForm is created
         form.initialize(); //mainForm is initialized
@@ -86,6 +104,7 @@ public class TuringClient{
      * Method that sets defaultConfig with default values
      */
     private static void setDefault(){
+        defaultConfig.setProperty("serverAddress","localhost");
         defaultConfig.setProperty("portTCP","55432");
         defaultConfig.setProperty("portRMI","55431");
         defaultConfig.setProperty("portNotifier","1099");
@@ -107,6 +126,20 @@ public class TuringClient{
             defaultConfig.store(output,"DEFAULT VALUES");
             output.close();
         }
+        editor=new ConfigEditor(config,lock);
+        editor.initialize();
+        editor.open();
+        synchronized(lock) {
+            while (editor.isVisible()) //Wait until editor is no longer visible, then proceed with the client start-up
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+        }
+
+        //get the correct values only after editor is no longer visible
+        server=config.getProperty("serverAddress");
         portTCP=getIntegerProperty("portTCP");
         portRMI=getIntegerProperty("portRMI");
         portNotifier=getIntegerProperty("portNotifier");
