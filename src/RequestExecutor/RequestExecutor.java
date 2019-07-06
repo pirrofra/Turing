@@ -60,7 +60,7 @@ public class RequestExecutor {
      * Method to send a login request to the server
      * @param username user who wants to login
      * @param password password for login
-     * @param port port used by the client for UDP notifications
+     * @param port port used by the client for RMI
      * @return MessageBuffer with the result
      * @throws IOException an error occurs while communicating with the server
      */

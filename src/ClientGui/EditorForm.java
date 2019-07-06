@@ -129,7 +129,7 @@ import java.util.Vector;
 
     /**
      * Private Method that create the panel that contains information about file currently editing
-     * @return JPanel that contains file informations
+     * @return JPanel that contains file's information
      */
     private JPanel initializeFileInfo(){
         JDialog me=this;

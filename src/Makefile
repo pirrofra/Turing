@@ -5,6 +5,7 @@ CLASS_PATH = .
 CLIENT_DEPENDECIES = ChatRoom/ChatRoom.java \
 			      ClientGui/ButtonHandler.java \
 			      ClientGui/ClientNotifier.java \
+			      ClientGui/ConfigEditor.java \
 			      ClientGui/EditorForm.java \
 			      ClientGui/EnterListener.java \
 			      ClientGui/LogForm.java \

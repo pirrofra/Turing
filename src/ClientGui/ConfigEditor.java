@@ -23,7 +23,7 @@ public class ConfigEditor extends JFrame {
     /**
      * Properties object that stores the configuration values
      */
-    private Properties config;
+    private final Properties config;
 
     /**
      * lock used to wake the main thread up
@@ -33,27 +33,27 @@ public class ConfigEditor extends JFrame {
     /**
      * Text Field used to edit the value of portTCP
      */
-    private JTextField portTCP;
+    private final JTextField portTCP;
 
     /**
      * Text Field used to edit the value of dirFiles
      */
-    private JTextField dirFiles;
+    private final JTextField dirFiles;
 
     /**
      * Text Field used to edit the value of portNotifier
      */
-    private JTextField portNotifier;
+    private final JTextField portNotifier;
 
     /**
      * Text Field used to edit the value of serverAddress
      */
-    private JTextField serverAddress;
+    private final JTextField serverAddress;
 
     /**
      * Text Field used to edit the value of portRMI
      */
-    private JTextField portRMI;
+    private final JTextField portRMI;
 
     /**
      * public class constructor
