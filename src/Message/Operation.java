@@ -35,7 +35,8 @@ public enum Operation {
     REQUEST_INCOMPLETE(-13),
     CLIENT_NOT_LOGGED_IN(-14),
     INVALID_REQUEST(-15),
-    INVALID_CHARACTERS(-16);
+    INVALID_CHARACTERS(-16),
+    NAME_TOO_LONG(-17);
     // --- RESPONSE --- //
 
     int value;
@@ -123,6 +124,9 @@ public enum Operation {
                 break;
             case INVALID_CHARACTERS:
                 result= "Don't use any whitespaces, slash or backslash";
+                break;
+            case NAME_TOO_LONG:
+                result="Name used is too long, use name shorter than 128 characters";
                 break;
             default:
                 result=  "An invalid response was sent by the server";
